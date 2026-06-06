@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Freezer Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ice: #e8f4f8;
+    --deep: #0d2137;
+    --frost: #b8dce8;
+    --accent: #2a7fa5;
+    --warm: #e8c97a;
+    --card: #ffffff;
+    --text: #1a2e3b;
+    --muted: #6b8a99;
+    --green: #4caf7d;
+    --amber: #e8a030;
+    --red: #d9534f;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--deep);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 10% 20%, rgba(42,127,165,0.18) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, rgba(184,220,232,0.12) 0%, transparent 50%);
+  }
+
+  header {
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 2px;
+    background: var(--warm);
+    margin: 1.2rem auto 0;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    color: #fff;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+
+  h1 span {
+    color: var(--warm);
+  }
+
+  .subtitle {
+    color: var(--frost);
+    font-weight: 300;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    letter-spacing: 0.3px;
+  }
+
+  .count-badge {
+    display: inline-block;
+    background: rgba(232,201,122,0.15);
+    border: 1px solid rgba(232,201,122,0.3);
+    color: var(--warm);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    margin-top: 1rem;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 4rem;
+  }
+
+  /* Filter bar */
+  .filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    justify-content: center;
+  }
+
+  .filter-btn {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(184,220,232,0.2);
+    color: var(--frost);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* Cards grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.2rem;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    animation: fadeUp 0.4s ease both;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header {
+    padding: 1.2rem 1.4rem 1rem;
+    border-bottom: 1px solid #f0f4f7;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    color: var(--deep);
+    line-height: 1.2;
+  }
+
+  .card-category {
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-top: 0.2rem;
+  }
+
+  .freeze-badge {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .freeze-yes { background: #e8f5ee; color: var(--green); }
+  .freeze-blanch { background: #fff8e6; color: var(--amber); }
+  .freeze-no { background: #fdecea; color: var(--red); }
+
+  .card-body {
+    padding: 1.2rem 1.4rem;
+  }
+
+  .section-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  .steps {
+    list-style: none;
+    margin-bottom: 1rem;
+  }
+
+  .steps li {
+    font-size: 0.85rem;
+    color: var(--text);
+    line-height: 1.5;
+    padding: 0.25rem 0 0.25rem 1.4rem;
+    position: relative;
+    font-weight: 300;
+  }
+
+  .steps li::before {
+    content: counter(step);
+    counter-increment: step;
+    position: absolute;
+    left: 0;
+    top: 0.3rem;
+    width: 18px;
+    height: 18px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .steps { counter-reset: step; }
+
+  .meta-row {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .meta-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #f5f8fa;
+    border-radius: 8px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.78rem;
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  .meta-pill .icon { font-size: 0.9rem; }
+
+  .best-for {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .best-for strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .tip-box {
+    margin-top: 1rem;
+    background: #f8f4e8;
+    border-left: 3px solid var(--warm);
+    border-radius: 0 8px 8px 0;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+    color: #5a4a1a;
+    line-height: 1.5;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--frost);
+    padding: 3rem 1rem;
+    font-size: 0.95rem;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>The <span>Freezer</span> Guide</h1>
+  <p class="subtitle">Freeze smarter · Waste less · Eat better</p>
+  <div class="count-badge" id="countBadge">1 item</div>
+</header>
+
+<div class="container">
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="vegetable">Vegetables</button>
+    <button class="filter-btn" data-filter="herb">Herbs</button>
+    <button class="filter-btn" data-filter="fruit">Fruit</button>
+    <button class="filter-btn" data-filter="dairy">Dairy</button>
+    <button class="filter-btn" data-filter="meat">Meat</button>
+    <button class="filter-btn" data-filter="grain">Grains & Bread</button>
+    <button class="filter-btn" data-filter="other">Other</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+const items = [
+  {
+    name: "Savoy Cabbage",
+    category: "vegetable",
+    freezeType: "blanch",
+    freezeLabel: "Blanch first",
+    duration: "Up to 12 months",
+    steps: [
+      "Remove outer leaves; cut into wedges or shred to your preferred size",
+      "Blanch in boiling water — 2 mins shredded, 3 mins for wedges",
+      "Plunge immediately into ice water for the same time to stop cooking",
+      "Drain thoroughly and pat dry — excess moisture causes freezer burn",
+      "Open-freeze on a tray for 1–2 hours until solid",
+      "Transfer to bags, press out all air, label and date"
+    ],
+    bestFor: "Soups, stews, braised dishes, stir-fries — any cooked application. Not suitable for raw or salad use after freezing.",
+    tip: "Pre-freezing on a tray keeps pieces separate so you can take exactly what you need."
+  },
+  {
+    name: "Chives",
+    category: "herb",
+    freezeType: "yes",
+    freezeLabel: "No blanching",
+    duration: "Up to 6 months (best in first 3)",
+    steps: [
+      "Wash and dry thoroughly — any moisture will cause clumping",
+      "Chop to your preferred size (they won't be usable whole after freezing)",
+      "Spread on a tray and open-freeze for 1 hour",
+      "Transfer to a small freezer bag, press out all air, label and date",
+      "Alternative: pack into ice cube trays with a little water or olive oil, freeze solid, then bag up"
+    ],
+    bestFor: "Soups, sauces, scrambled eggs, dressings, mashed potato — stirred in at the end of cooking. Texture softens so not suitable as a fresh garnish after freezing.",
+    tip: "The ice cube method is brilliant for portion control — drop a cube straight into the pan from frozen."
+  },
+  {
+    name: "Mushrooms",
+    category: "vegetable",
+    freezeType: "blanch",
+    freezeLabel: "Cook first",
+    duration: "Up to 12 months",
+    steps: [
+      "Clean with a damp cloth — don't wash, they absorb water",
+      "Slice or leave whole depending on size",
+      "Sauté in a little olive oil or butter over high heat for 3–4 minutes until just cooked and moisture has released",
+      "Spread on a tray and leave to cool completely",
+      "Open-freeze on the tray for 1–2 hours until solid",
+      "Transfer to bags, press out all air, label and date"
+    ],
+    bestFor: "Soups, stews, pasta sauces, risotto, omelettes, stir-fries — any cooked dish. Not suitable for raw use after freezing.",
+    tip: "The sauté method gives far better flavour and texture than blanching — worth the extra few minutes."
+  }
+];
+
+const freezeClass = { yes: 'freeze-yes', blanch: 'freeze-blanch', no: 'freeze-no' };
+
+function renderCards(filter = 'all') {
+  const grid = document.getElementById('grid');
+  const filtered = filter === 'all' ? items : items.filter(i => i.category === filter);
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty-state">No items in this category yet.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map((item, idx) => `
+    <div class="card" style="animation-delay:${idx * 0.06}s">
+      <div class="card-header">
+        <div>
+          <div class="card-title">${item.name}</div>
+          <div class="card-category">${item.category}</div>
+        </div>
+        <div class="freeze-badge ${freezeClass[item.freezeType]}">${item.freezeLabel}</div>
+      </div>
+      <div class="card-body">
+        <div class="section-label">Method</div>
+        <ol class="steps">
+          ${item.steps.map(s => `<li>${s}</li>`).join('')}
+        </ol>
+        <div class="meta-row">
+          <div class="meta-pill"><span class="icon">🕐</span>${item.duration}</div>
+        </div>
+        <div class="section-label">Best used in</div>
+        <div class="best-for">${item.bestFor}</div>
+        ${item.tip ? `<div class="tip-box">💡 ${item.tip}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  const count = items.length;
+  document.getElementById('countBadge').textContent = `${count} item${count !== 1 ? 's' : ''}`;
+}
+
+document.getElementById('filters').addEventListener('click', e => {
+  if (!e.target.classList.contains('filter-btn')) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  renderCards(e.target.dataset.filter);
+});
+
+renderCards();
+</script>
+</body>
+</html>
