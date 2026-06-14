@@ -1,1 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summer Eating Plan — Week of 26 May 2026</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(160deg, #f0f7f4 0%, #fdf6ee 100%);
+    min-height: 100vh;
+    color: #1a1a1a;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(150deg, #1a4a3a 0%, #2d7a5f 50%, #e8a020 100%);
+    padding: 28px 20px 22px;
+    color: white;
+    text-align: center;
+  }
+  .header-eyebrow {
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    opacity: 0.6; margin-bottom: 8px; font-family: monospace;
+  }
+  .header h1 {
+    font-family: Georgia, serif; font-size: 26px; font-weight: 900;
+    margin-bottom: 4px; line-height: 1.2;
+  }
+  .header p { opacity: 0.8; font-size: 12.5px; margin-bottom: 14px; }
+  .badge-row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+  .badge {
+    background: rgba(255,255,255,0.15); border-radius: 20px;
+    padding: 4px 10px; font-size: 11px; font-weight: 600;
+  }
+  .portion-row { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
+  .portion-chip {
+    background: rgba(255,255,255,0.12); border-radius: 8px;
+    padding: 3px 9px; font-size: 10px; font-family: monospace;
+  }
+
+  /* TABS */
+  .tab-bar {
+    display: flex; background: white;
+    border-bottom: 2px solid #eee;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .tab-btn {
+    flex: 1; padding: 13px 0; border: none; background: none;
+    font-size: 13.5px; cursor: pointer; font-family: inherit;
+    font-weight: 500; color: #999;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px; transition: all 0.2s;
+  }
+  .tab-btn.active { font-weight: 700; color: #2d6a4f; border-bottom-color: #2d6a4f; }
+
+  /* CONTENT */
+  .content { padding: 14px 14px 50px; max-width: 680px; margin: 0 auto; }
+
+  .info-box {
+    border-radius: 12px; padding: 10px 14px;
+    margin-bottom: 14px; font-size: 12.5px; line-height: 1.6;
+  }
+  .info-box.green { background: #e8f4f0; border: 1px solid #b8ddd4; color: #1a4a3a; }
+
+  /* DAY ACCORDIONS */
+  .day-wrap { margin-bottom: 10px; }
+  .day-btn {
+    width: 100%; background: white; border-radius: 12px;
+    padding: 13px 16px; display: flex; align-items: center;
+    justify-content: space-between; cursor: pointer;
+    transition: all 0.2s; border: 2px solid var(--day-color);
+    font-family: inherit;
+  }
+  .day-btn.open { border-radius: 12px 12px 0 0; background: var(--day-color); color: white; }
+  .day-btn-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .day-name { font-family: Georgia, serif; font-weight: 900; font-size: 17px; }
+  .day-tag {
+    border-radius: 20px; padding: 2px 9px; font-size: 10.5px; font-weight: 700;
+    background: rgba(0,0,0,0.07);
+    color: var(--day-color);
+  }
+  .day-btn.open .day-tag { background: rgba(255,255,255,0.2); color: white; }
+  .day-chevron { font-size: 16px; transition: transform 0.2s; display: inline-block; }
+  .day-btn.open .day-chevron { transform: rotate(180deg); }
+
+  .day-body {
+    background: #f9f9f7; border-radius: 0 0 12px 12px;
+    border: 2px solid var(--day-color); border-top: none;
+    padding: 14px 12px 6px;
+    display: none;
+  }
+  .day-body.open { display: block; }
+
+  /* MEAL CARDS */
+  .meal-card {
+    background: white; border-radius: 14px; margin-bottom: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    border-left: 4px solid var(--accent);
+    overflow: hidden;
+  }
+  .meal-top { padding: 14px 16px 12px; }
+  .meal-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; flex-wrap: wrap; }
+  .meal-type-icon { font-size: 15px; }
+  .meal-type-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
+    color: #aaa; font-weight: 700;
+  }
+  .pill {
+    font-size: 10px; border-radius: 20px; padding: 1px 8px; font-weight: 700;
+  }
+  .pill-count { background: rgba(0,0,0,0.07); color: var(--accent); }
+  .pill-veggie { background: #e8f5e0; color: #3a7a20; }
+  .pill-special { background: #fff3cd; color: #856404; }
+  .meal-name {
+    font-family: Georgia, serif; font-size: 15px; font-weight: 700;
+    color: #1a1a1a; margin-bottom: 6px; line-height: 1.3;
+  }
+  .macro-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+  .macro-badge {
+    border-radius: 20px; padding: 2px 9px; font-size: 11px;
+    font-family: monospace; font-weight: 700; letter-spacing: 0.3px;
+  }
+  .macro-p { background: #2d6a4f18; color: #2d6a4f; border: 1px solid #2d6a4f33; }
+  .macro-f { background: #6b422618; color: #6b4226; border: 1px solid #6b422633; }
+  .macro-c { background: #1d355718; color: #1d3557; border: 1px solid #1d355733; }
+  .gut-note {
+    font-size: 11.5px; color: #5c4a7a; background: #f4f1fb;
+    border-radius: 8px; padding: 5px 10px; margin-bottom: 0;
+  }
+  .extra-note {
+    font-size: 11.5px; color: #a4512a; background: #fdf3ec;
+    border-radius: 8px; padding: 5px 10px; margin-top: 6px;
+  }
+
+  /* METHOD TOGGLE */
+  .method-btn {
+    width: 100%; background: #f8f8f6; border: none; border-top: 1px solid #f0f0ee;
+    padding: 9px 16px; text-align: left; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+    font-family: inherit;
+  }
+  .method-btn.open { background: rgba(0,0,0,0.04); }
+  .method-chevron { font-size: 14px; transition: transform 0.2s; display: inline-block; }
+  .method-btn.open .method-chevron { transform: rotate(180deg); }
+  .method-body {
+    padding: 14px 16px; border-top: 1px solid rgba(0,0,0,0.08);
+    background: rgba(0,0,0,0.03);
+    display: none;
+  }
+  .method-body.open { display: block; }
+  .method-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: #999; font-weight: 700; margin-bottom: 4px;
+  }
+  .method-portions { font-size: 12.5px; color: #444; line-height: 1.65; margin-bottom: 10px; }
+  .method-toppings { font-size: 12.5px; color: #666; line-height: 1.65; font-style: italic; margin-top: 4px; }
+  .method-instructions { font-size: 12.5px; color: #444; line-height: 1.75; }
+
+  /* SHOPPING LIST */
+  .shop-cat-title {
+    font-family: Georgia, serif; font-size: 15px; font-weight: 700;
+    color: #1a1a1a; margin-bottom: 10px; margin-top: 0;
+    padding: 6px 0 8px; border-bottom: 2px solid #ece8e0;
+  }
+  .shop-cat { margin-bottom: 20px; }
+  .shop-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; background: white; border-radius: 10px;
+    margin-bottom: 6px; border: 1.5px solid #eeebe5;
+    cursor: pointer; transition: all 0.15s; user-select: none;
+  }
+  .shop-item.checked {
+    background: #f0faf4; border-color: #a8d8b8; opacity: 0.65;
+  }
+  .shop-circle {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid #ccc; background: white;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .shop-item.checked .shop-circle { background: #2d6a4f; border-color: #2d6a4f; }
+  .shop-check-svg { display: none; }
+  .shop-item.checked .shop-check-svg { display: block; }
+  .shop-item-name {
+    font-size: 13.5px; font-weight: 600; color: #1a1a1a; line-height: 1.3;
+  }
+  .shop-item.checked .shop-item-name { color: #888; text-decoration: line-through; }
+  .shop-item-qty { font-size: 11.5px; color: #2d6a4f; font-weight: 700; margin-top: 1px; }
+  .shop-item.checked .shop-item-qty { color: #aaa; }
+  .shop-item-note { font-size: 11px; color: #aaa; margin-top: 1px; line-height: 1.4; }
+
+  /* PRINCIPLES BOX */
+  .principles-box {
+    background: linear-gradient(135deg, #1a4a3a, #2d7a5f);
+    border-radius: 14px; padding: 16px 18px; color: white; margin-top: 4px;
+  }
+  .principles-box h3 {
+    font-family: Georgia, serif; font-size: 16px; font-weight: 700; margin-bottom: 10px;
+  }
+  .principles-box ul {
+    margin: 0; padding-left: 16px; font-size: 12.5px; line-height: 1.9; opacity: 0.9;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  @media (max-width: 400px) {
+    .header h1 { font-size: 22px; }
+    .content { padding: 12px 10px 50px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-eyebrow">Week of 26 May 2026</div>
+  <h1>Summer Eating Plan</h1>
+  <p>Light · Fresh · Gut-first · Heatwave-ready</p>
+  <div class="badge-row">
+    <span class="badge">🥗 Big Salads</span>
+    <span class="badge">🌿 Veggie Dinners</span>
+    <span class="badge">🐟 Cod Once</span>
+    <span class="badge">🦠 Daily Ferments</span>
+    <span class="badge">⚡ Smart Leftovers</span>
+  </div>
+  <div class="portion-row">
+    <span class="portion-chip">Mon <strong>×2</strong></span>
+    <span class="portion-chip">Tue <strong>×1</strong></span>
+    <span class="portion-chip">Wed <strong>×1</strong></span>
+    <span class="portion-chip">Thu <strong>×1</strong></span>
+    <span class="portion-chip">Fri <strong>×1</strong></span>
+    <span class="portion-chip">Sat <strong>×1</strong></span>
+    <span class="portion-chip">Sun <strong>B+L ×1 / D ×2</strong></span>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('plan', this)">📅 Meal Plan</button>
+  <button class="tab-btn" onclick="switchTab('shopping', this)">🛒 Shopping List</button>
+</div>
+
+<div class="content">
+
+  <!-- MEAL PLAN TAB -->
+  <div id="tab-plan" class="tab-panel active">
+    <div class="info-box green">
+      <strong>☀️ Heatwave plan:</strong> Minimal oven use, lots of no-cook meals.
+      🌿 Veggie badge = meat-free dinner. Cod is Thursday only.
+      Tap any day then <em>Portions &amp; Method</em> for full instructions.
+    </div>
+
+    <!-- MONDAY -->
+    <div class="day-wrap">
+      <button class="day-btn open" style="--day-color:#2d6a4f" onclick="toggleDay(this)">
+        <div class="day-btn-left">
+          <span class="day-name">Monday</span>
+          <span class="day-tag">All meals for 2</span>
+        </div>
+        <span class="day-chevron">⌄</span>
+      </button>
+      <div class="day-body open" style="--day-color:#2d6a4f">
+
+        <!-- Mon Breakfast -->
+        <div class="meal-card" style="--accent:#2d6a4f">
+          <div class="meal-top">
+            <div class="meal-meta">
+              <span class="meal-type-icon">🌅</span>
+              <span class="meal-type-label">Breakfast</span>
+              <span class="pill pill-count">for 2</span>
+            </div>
+            <div class="meal-name">Maple Pecan &amp; Apple Overnight Oats</div>
+            <div class="macro-row">
+              <span class="macro-badge macro-p">Protein 18g</span>
+              <span class="macro-badge macro-f">Fibre 9g</span>
+              <span class="macro-badge macro-c">Carbs 52g</span>
+            </div>
+            <div class="gut-note">🦠 Kefir adds live cultures; apple pectin directly feeds gut bacteria</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)">
+            <span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span>
+          </button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">Per person: 80g oats, 200ml oat milk, 2 tbsp kefir
+              <div class="method-toppings">Per person: 1 apple (grated), 1 handful pecans (toasted), 1 tsp maple syrup, ½ tsp cinnamon</div>
+            </div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Night before: mix oats, oat milk and kefir in two jars. Stir well, seal and refrigerate. Morning: grate apple directly on top. Toast pecans in a dry pan 2–3 mins. Scatter, drizzle maple syrup, dust with cinnamon.</div>
+          </div>
+        </div>
+
+        <!-- Mon Lunch -->
+        <div class="meal-card" style="--accent:#2d6a4f">
+          <div class="meal-top">
+            <div class="meal-meta">
+              <span class="meal-type-icon">☀️</span>
+              <span class="meal-type-label">Lunch</span>
+              <span class="pill pill-count">for 2</span>
+            </div>
+            <div class="meal-name">Greek-Style Mezze Plate</div>
+            <div class="macro-row">
+              <span class="macro-badge macro-p">Protein 20g</span>
+              <span class="macro-badge macro-f">Fibre 12g</span>
+              <span class="macro-badge macro-c">Carbs 44g</span>
+            </div>
+            <div class="gut-note">🦠 Chickpeas, olives and olive oil deliver a powerful prebiotic and polyphenol combination</div>
+            <div class="extra-note">⚡ Zero cooking — assembled in 5 minutes</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)">
+            <span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span>
+          </button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">Per person: 3 tbsp hummus, 50g chickpeas (drained), 5 olives, 4 cherry toms, ½ cucumber, 1 slice rye sourdough, handful rocket
+              <div class="method-toppings">Drizzle of extra virgin olive oil, pinch smoked paprika, lemon wedge</div>
+            </div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">No cooking needed. Drain and rinse chickpeas. Halve cherry tomatoes, slice cucumber into rounds. Arrange everything on a large plate or board — hummus in the centre, chickpeas alongside, olives, tomatoes, cucumber and rocket around the edges. Drizzle olive oil over hummus, dust with paprika. Tear sourdough for dipping. Squeeze lemon over everything just before eating.</div>
+          </div>
+        </div>
+
+        <!-- Mon Dinner -->
+        <div class="meal-card" style="--accent:#2d6a4f">
+          <div class="meal-top">
+            <div class="meal-meta">
+              <span class="meal-type-icon">🌙</span>
+              <span class="meal-type-label">Dinner</span>
+              <span class="pill pill-count">for 2</span>
+            </div>
+            <div class="meal-name">Grilled Lemon Herb Chicken Breast with Fattoush Salad</div>
+            <div class="macro-row">
+              <span class="macro-badge macro-p">Protein 46g</span>
+              <span class="macro-badge macro-f">Fibre 10g</span>
+              <span class="macro-badge macro-c">Carbs 22g</span>
+            </div>
+            <div class="gut-note">🦠 Fresh herb diversity adds plant points; radishes are an underrated prebiotic vegetable</div>
+            <div class="extra-note">💡 Grill 2 extra chicken breasts tonight — refrigerate for Tuesday lunch</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)">
+            <span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span>
+          </button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">Per person: 1 large chicken breast (200g), 2 large handfuls mixed leaves, 4 radishes, ½ cucumber, handful cherry toms, 4 mint leaves
+              <div class="method-toppings">Marinade: juice of 1 lemon, 1 tbsp olive oil, 1 garlic clove, 1 tsp dried oregano. Dressing: 1 tbsp olive oil, 1 tsp red wine vinegar, ½ tsp sumac</div>
+            </div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Mix marinade, coat both chicken breasts, rest 20 mins minimum. Heat griddle pan to high. Cook 5–6 mins each side until charred and juices run clear (75°C internal). Rest 5 mins, slice. Slice radishes, halve tomatoes, dice cucumber. Toss salad with dressing. Plate salad, lay sliced chicken over. Sumac gives a brilliant lemony tang — don't skip it.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TUESDAY -->
+    <div class="day-wrap">
+      <button class="day-btn" style="--day-color:#1d3557" onclick="toggleDay(this)">
+        <div class="day-btn-left">
+          <span class="day-name">Tuesday</span>
+          <span class="day-tag">All meals for 1</span>
+        </div>
+        <span class="day-chevron">⌄</span>
+      </button>
+      <div class="day-body" style="--day-color:#1d3557">
+        <div class="meal-card" style="--accent:#1d3557">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">🌅</span><span class="meal-type-label">Breakfast</span><span class="pill pill-count">for 1</span></div>
+            <div class="meal-name">Blueberry &amp; Walnut Overnight Oats</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 14g</span><span class="macro-badge macro-f">Fibre 8g</span><span class="macro-badge macro-c">Carbs 48g</span></div>
+            <div class="gut-note">🦠 Blueberries are among the richest polyphenol fruits; walnuts are Spector's top nut recommendation</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">50g oats, 130ml oat milk, 1 tsp chia seeds<div class="method-toppings">Large handful blueberries, 1 tbsp crushed walnuts, 1 tsp raw honey</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Night before: combine oats, oat milk and chia seeds in a jar. Stir, seal, refrigerate. Morning: pile blueberries on top, crush walnuts and scatter over, drizzle honey.</div>
+          </div>
+        </div>
+        <div class="meal-card" style="--accent:#1d3557">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">☀️</span><span class="meal-type-label">Lunch</span><span class="pill pill-count">for 1</span></div>
+            <div class="meal-name">Grilled Chicken &amp; Mango Salad</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 40g</span><span class="macro-badge macro-f">Fibre 10g</span><span class="macro-badge macro-c">Carbs 30g</span></div>
+            <div class="gut-note">🦠 Mango provides prebiotic fibre; diverse leaves add different phytonutrients</div>
+            <div class="extra-note">⚡ 5-min prep — uses Monday's chicken</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">Monday's leftover chicken breast (sliced cold), ½ fresh mango (sliced), 2 large handfuls rocket, ¼ cucumber, 1 tbsp pumpkin seeds<div class="method-toppings">Dressing: 1 tsp olive oil, juice of ½ lime, ½ tsp honey, pinch chilli flakes</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Slice cold chicken thinly. Peel and slice mango. Slice cucumber. Whisk dressing. Arrange rocket as the base, lay mango and cucumber over, top with sliced chicken. Drizzle dressing, scatter pumpkin seeds.</div>
+          </div>
+        </div>
+        <div class="meal-card" style="--accent:#1d3557">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">🌙</span><span class="meal-type-label">Dinner</span><span class="pill pill-count">for 1</span><span class="pill pill-veggie">🌿 Veggie</span></div>
+            <div class="meal-name">Grilled Halloumi with Herby Quinoa Tabbouleh</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 36g</span><span class="macro-badge macro-f">Fibre 16g</span><span class="macro-badge macro-c">Carbs 50g</span></div>
+            <div class="gut-note">🦠 Fresh herbs count as plant points; parsley and mint both actively support gut diversity</div>
+            <div class="extra-note">💡 Make double quinoa tabbouleh — refrigerate for Wednesday lunch</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">125g halloumi (sliced into 4), 60g dry quinoa, large handful flat-leaf parsley, handful mint, 3 spring onions, 10 cherry toms<div class="method-toppings">Dressing: 2 tbsp olive oil, juice of 1 lemon, salt &amp; pepper</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Cook quinoa: rinse, simmer in 120ml salted water 12 mins covered, rest 5 mins, spread on a tray to cool. Finely chop parsley, mint and spring onions. Halve tomatoes. Mix into cooled quinoa with dressing. Pat halloumi dry — key for browning. Griddle or dry-fry over high heat 2 mins each side until deep golden. Serve immediately on the tabbouleh.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEDNESDAY -->
+    <div class="day-wrap">
+      <button class="day-btn" style="--day-color:#6b4226" onclick="toggleDay(this)">
+        <div class="day-btn-left"><span class="day-name">Wednesday</span><span class="day-tag">All meals for 1</span></div>
+        <span class="day-chevron">⌄</span>
+      </button>
+      <div class="day-body" style="--day-color:#6b4226">
+        <div class="meal-card" style="--accent:#6b4226">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">🌅</span><span class="meal-type-label">Breakfast</span><span class="pill pill-count">for 1</span></div>
+            <div class="meal-name">Banana, Almond Butter &amp; Dark Choc Overnight Oats</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 16g</span><span class="macro-badge macro-f">Fibre 11g</span><span class="macro-badge macro-c">Carbs 54g</span></div>
+            <div class="gut-note">🦠 Dark chocolate 85%+ is polyphenol-rich — one of Spector's top-rated everyday foods</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">50g oats, 130ml oat milk, 1 ripe banana<div class="method-toppings">1 tbsp almond butter (100% almonds), 10g dark chocolate 85%+ (shaved), pinch sea salt</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Night before: mash half the banana into oats with oat milk. Stir, refrigerate. Morning: slice remaining banana on top, add almond butter, shave dark chocolate over, tiny pinch of sea salt.</div>
+          </div>
+        </div>
+        <div class="meal-card" style="--accent:#6b4226">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">☀️</span><span class="meal-type-label">Lunch</span><span class="pill pill-count">for 1</span></div>
+            <div class="meal-name">Quinoa Tabbouleh with Hummus &amp; Rye</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 22g</span><span class="macro-badge macro-f">Fibre 12g</span><span class="macro-badge macro-c">Carbs 52g</span></div>
+            <div class="gut-note">🦠 Pomegranate is one of Spector's highest-rated foods for polyphenol content</div>
+            <div class="extra-note">⚡ Zero cooking — Tuesday's tabbouleh does all the work</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">Tuesday's leftover tabbouleh, 3 tbsp hummus, 1 slice rye sourdough, handful extra rocket<div class="method-toppings">Extra lemon squeeze, drizzle olive oil, pomegranate seeds</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Remove tabbouleh from fridge 10 mins before eating. Spread hummus on sourdough. Pile tabbouleh into a bowl, scatter rocket through, squeeze lemon, drizzle olive oil. Scatter pomegranate seeds. Sourdough on the side for scooping.</div>
+          </div>
+        </div>
+        <div class="meal-card" style="--accent:#6b4226">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">🌙</span><span class="meal-type-label">Dinner</span><span class="pill pill-count">for 1</span><span class="pill pill-veggie">🌿 Veggie</span></div>
+            <div class="meal-name">Spiced Butter Bean &amp; Roasted Pepper Shakshuka</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 28g</span><span class="macro-badge macro-f">Fibre 12g</span><span class="macro-badge macro-c">Carbs 38g</span></div>
+            <div class="gut-note">🦠 Butter beans are the highest-fibre legume; cooked tomatoes deliver lycopene more effectively than raw</div>
+            <div class="extra-note">💡 Use the other half tin of butter beans for Thursday's lunch</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">2 eggs, ½ tin butter beans (drained), 1 roasted red pepper (jar), ½ tin chopped tomatoes, ½ red onion, 1 garlic clove<div class="method-toppings">½ tsp cumin, ½ tsp smoked paprika, pinch chilli flakes, 1 tbsp olive oil, 1 slice rye sourdough, handful rocket to serve</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Dice onion. Heat olive oil in a small pan over medium heat. Cook onion 5 mins. Add garlic and spices, stir 1 min. Slice roasted pepper and add with chopped tomatoes and butter beans. Simmer 6–8 mins until slightly thickened. Season well. Make two wells, crack an egg into each. Cover and cook on low heat 6–8 mins until whites just set, yolks still runny. Serve with rocket and sourdough.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THURSDAY -->
+    <div class="day-wrap">
+      <button class="day-btn" style="--day-color:#5c4a7a" onclick="toggleDay(this)">
+        <div class="day-btn-left"><span class="day-name">Thursday</span><span class="day-tag">All meals for 1</span></div>
+        <span class="day-chevron">⌄</span>
+      </button>
+      <div class="day-body" style="--day-color:#5c4a7a">
+        <div class="meal-card" style="--accent:#5c4a7a">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">🌅</span><span class="meal-type-label">Breakfast</span><span class="pill pill-count">for 1</span></div>
+            <div class="meal-name">Mango &amp; Coconut Overnight Oats</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 12g</span><span class="macro-badge macro-f">Fibre 10g</span><span class="macro-badge macro-c">Carbs 56g</span></div>
+            <div class="gut-note">🦠 Rotating fruit varieties each day feeds different microbiome strains</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">50g oats, 100ml oat milk, 30ml coconut milk (tinned, full fat)<div class="method-toppings">½ fresh mango (diced), 1 tbsp toasted coconut flakes, zest and juice of ½ lime</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Night before: combine oats with oat milk and coconut milk. Stir, refrigerate. Morning: dice mango, zest lime directly over jar, squeeze in juice. Scatter toasted coconut flakes.</div>
+          </div>
+        </div>
+        <div class="meal-card" style="--accent:#5c4a7a">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">☀️</span><span class="meal-type-label">Lunch</span><span class="pill pill-count">for 1</span></div>
+            <div class="meal-name">Butter Bean, Cucumber &amp; Herb Smash Bowl</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 18g</span><span class="macro-badge macro-f">Fibre 8g</span><span class="macro-badge macro-c">Carbs 38g</span></div>
+            <div class="gut-note">🦠 Legumes served cold retain resistant starch — excellent for gut bacteria</div>
+            <div class="extra-note">⚡ 5-min no-cook lunch — uses Wednesday's butter beans</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">Wednesday's remaining butter beans, ½ cucumber (diced), 4 cherry toms (halved), handful mint, handful parsley, 1 slice rye sourdough<div class="method-toppings">Dressing: 1 tbsp olive oil, juice of ½ lemon, pinch chilli flakes, salt &amp; pepper</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Drain butter beans. Lightly smash half with a fork — leave the rest whole for texture. Dice cucumber, halve tomatoes, roughly chop herbs. Toss everything with the dressing. Pile into a bowl. Toast sourdough alongside. Done in under 5 minutes.</div>
+          </div>
+        </div>
+        <div class="meal-card" style="--accent:#5c4a7a">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">🌙</span><span class="meal-type-label">Dinner</span><span class="pill pill-count">for 1</span></div>
+            <div class="meal-name">Sesame-Crusted Cod with Cucumber Noodle &amp; Edamame Salad</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 44g</span><span class="macro-badge macro-f">Fibre 12g</span><span class="macro-badge macro-c">Carbs 24g</span></div>
+            <div class="gut-note">🦠 Edamame provides complete plant protein; cucumber keeps the dish deeply hydrating</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">1 cod fillet (180–200g), 1 large cucumber, 80g edamame (frozen, defrosted), 2 spring onions, 1 tbsp sesame seeds<div class="method-toppings">Dressing: 1 tbsp tamari, 1 tsp sesame oil, juice of ½ lime, 1 tsp honey, 1 tsp fresh ginger (grated)</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Press sesame seeds onto both sides of cod. Heat olive oil over medium-high. Cook cod 3–4 mins each side until sesame is golden and fish flakes. Use a vegetable peeler to make cucumber ribbons. Defrost edamame in boiling water 2 mins, drain. Slice spring onions. Whisk dressing. Toss cucumber, edamame and spring onions with dressing. Pile into a bowl, lay cod alongside.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FRIDAY -->
+    <div class="day-wrap">
+      <button class="day-btn" style="--day-color:#a4512a" onclick="toggleDay(this)">
+        <div class="day-btn-left"><span class="day-name">Friday</span><span class="day-tag">All meals for 1</span></div>
+        <span class="day-chevron">⌄</span>
+      </button>
+      <div class="day-body" style="--day-color:#a4512a">
+        <div class="meal-card" style="--accent:#a4512a">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">🌅</span><span class="meal-type-label">Breakfast</span><span class="pill pill-count">for 1</span></div>
+            <div class="meal-name">Raspberry &amp; Hemp Seed Overnight Oats</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 15g</span><span class="macro-badge macro-f">Fibre 9g</span><span class="macro-badge macro-c">Carbs 49g</span></div>
+            <div class="gut-note">🦠 Hemp seeds provide complete protein and omega-3; raspberries are a top-tier fibre fruit</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">50g oats, 130ml oat milk, 1½ tbsp hemp seeds<div class="method-toppings">Large handful fresh raspberries, 1 tsp raw honey</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Night before: stir oats, oat milk and hemp seeds together. Refrigerate. Morning: scatter raspberries on top, lightly crushing a few. Drizzle honey.</div>
+          </div>
+        </div>
+        <div class="meal-card" style="--accent:#a4512a">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">☀️</span><span class="meal-type-label">Lunch</span><span class="pill pill-count">for 1</span></div>
+            <div class="meal-name">Smashed Chickpea, Roasted Pepper &amp; Avocado Open Sandwich</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 20g</span><span class="macro-badge macro-f">Fibre 14g</span><span class="macro-badge macro-c">Carbs 46g</span></div>
+            <div class="gut-note">🦠 Chickpeas and avocado deliver prebiotic fibre and gut-friendly monounsaturated fats</div>
+            <div class="extra-note">⚡ 10-min prep</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">2 slices rye sourdough, 100g chickpeas (drained), ½ avocado, 1 roasted red pepper (jar), handful rocket<div class="method-toppings">Juice of ¼ lemon, ¼ tsp smoked paprika, pinch chilli flakes, drizzle olive oil</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Drain and rinse chickpeas. Smash roughly with a fork — keep texture. Season with lemon, paprika and salt. Slice roasted pepper into strips. Toast sourdough. Spread chickpeas, top with avocado, roasted pepper and rocket. Finish with chilli flakes and olive oil.</div>
+          </div>
+        </div>
+        <div class="meal-card" style="--accent:#a4512a">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">🌙</span><span class="meal-type-label">Dinner</span><span class="pill pill-count">for 1</span><span class="pill pill-veggie">🌿 Veggie</span></div>
+            <div class="meal-name">Watermelon, Feta &amp; Mint Salad with Crispy Chickpea Croutons</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 22g</span><span class="macro-badge macro-f">Fibre 14g</span><span class="macro-badge macro-c">Carbs 42g</span></div>
+            <div class="gut-note">🦠 Watermelon is deeply hydrating — perfect in a heatwave; chickpeas add prebiotic fibre</div>
+            <div class="extra-note">💡 Roast double chickpeas — save half for Saturday dinner</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">300g watermelon (cubed), 40g feta (crumbled), large handful rocket, small handful mint leaves, 100g chickpeas (drained)<div class="method-toppings">Chickpea spice: ½ tsp cumin, ½ tsp paprika, 1 tsp olive oil. Dressing: 1 tbsp olive oil, juice of ½ lime, ½ tsp honey</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Toss chickpeas with olive oil and spices. Roast at 200°C for 20–25 mins, shaking once, until crispy. Cube watermelon, tear mint. Whisk dressing. Arrange rocket, watermelon and mint. Scatter warm crispy chickpeas over — the heat against cold watermelon is spectacular. Crumble feta, drizzle dressing.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SATURDAY -->
+    <div class="day-wrap">
+      <button class="day-btn" style="--day-color:#c77d31" onclick="toggleDay(this)">
+        <div class="day-btn-left"><span class="day-name">Saturday</span><span class="day-tag">All meals for 1</span></div>
+        <span class="day-chevron">⌄</span>
+      </button>
+      <div class="day-body" style="--day-color:#c77d31">
+        <div class="meal-card" style="--accent:#c77d31">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">🌅</span><span class="meal-type-label">Breakfast</span><span class="pill pill-count">for 1</span></div>
+            <div class="meal-name">Strawberry &amp; Chia Overnight Oats</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 14g</span><span class="macro-badge macro-f">Fibre 8g</span><span class="macro-badge macro-c">Carbs 48g</span></div>
+            <div class="gut-note">🦠 Chia seeds provide around 10g prebiotic fibre per 2 tbsp — exceptional</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">50g oats, 130ml oat milk, 1½ tsp chia seeds<div class="method-toppings">Large handful strawberries (hulled and halved), squeeze of fresh lemon</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Night before: combine oats, oat milk and chia seeds. Stir well, refrigerate. Morning: hull and halve strawberries, pile on top. Squeeze lemon to brighten. If too thick, stir in a splash of oat milk.</div>
+          </div>
+        </div>
+        <div class="meal-card" style="--accent:#c77d31">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">☀️</span><span class="meal-type-label">Lunch</span><span class="pill pill-count">for 1</span></div>
+            <div class="meal-name">Cold Soba Noodle Bowl</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 22g</span><span class="macro-badge macro-f">Fibre 8g</span><span class="macro-badge macro-c">Carbs 56g</span></div>
+            <div class="gut-note">🦠 Cold noodles form resistant starch — better for gut bacteria than freshly cooked</div>
+            <div class="extra-note">⚡ Quick and cooling</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">100g dry soba noodles (cook fresh), 1 tbsp sesame seeds, ½ lime, handful spinach or rocket<div class="method-toppings">Small drizzle tamari and sesame oil to loosen</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Cook soba per pack (5–6 mins), rinse under cold water, drain well. Toss with fresh greens. Squeeze lime over, scatter sesame seeds. Add a tiny drizzle of tamari and sesame oil. Serve cold — perfect for a hot day.</div>
+          </div>
+        </div>
+        <div class="meal-card" style="--accent:#c77d31">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">🌙</span><span class="meal-type-label">Dinner</span><span class="pill pill-count">for 1</span><span class="pill pill-veggie">🌿 Veggie</span></div>
+            <div class="meal-name">Smoky Black Bean Tacos in Cos Lettuce Cups with Mango Salsa</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 28g</span><span class="macro-badge macro-f">Fibre 16g</span><span class="macro-badge macro-c">Carbs 52g</span></div>
+            <div class="gut-note">🦠 Black beans and chickpeas together deliver exceptional prebiotic fibre diversity</div>
+            <div class="extra-note">✨ Cos lettuce cups — the clean, additive-free alternative to shop-bought tortillas</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">½ tin black beans (drained), ½ mango (diced), ½ red onion (finely diced), 1 avocado, 4–5 large cos lettuce leaves, Friday's leftover crispy chickpeas<div class="method-toppings">Bean spice: 1 tsp cumin, ½ tsp smoked paprika, ½ tsp chipotle flakes, 1 tbsp olive oil. Salsa: juice of 1 lime, small handful mint, pinch chilli</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Warm olive oil in a pan, add drained black beans with spices. Cook 4–5 mins, lightly smashing some beans for texture. Season well. Make salsa: toss diced mango, red onion, mint and lime juice. Slice avocado. Use cos lettuce leaves as taco shells. Fill each with smoky beans, mango salsa and avocado. Top with Friday's crispy chickpeas for crunch.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUNDAY -->
+    <div class="day-wrap">
+      <button class="day-btn" style="--day-color:#2a6674" onclick="toggleDay(this)">
+        <div class="day-btn-left"><span class="day-name">Sunday</span><span class="day-tag">Breakfast &amp; lunch for 1 · Dinner for 2</span></div>
+        <span class="day-chevron">⌄</span>
+      </button>
+      <div class="day-body" style="--day-color:#2a6674">
+        <div class="meal-card" style="--accent:#2a6674">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">🌅</span><span class="meal-type-label">Breakfast</span><span class="pill pill-count">for 1</span><span class="pill pill-special">🥞 Sunday special</span></div>
+            <div class="meal-name">Ricotta Pancakes with Honey, Lemon &amp; Fresh Berries</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 24g</span><span class="macro-badge macro-f">Fibre 8g</span><span class="macro-badge macro-c">Carbs 32g</span></div>
+            <div class="gut-note">🦠 Ricotta provides whey protein and calcium; kefir drizzle adds live cultures even on a treat breakfast</div>
+            <div class="extra-note">✨ Folding whipped egg whites in is the secret to the signature lightness — worth the extra bowl!</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">125g ricotta, 1 egg, 30g oat flour (blitz oats), 1 tsp baking powder, 1 tsp vanilla extract, pinch salt<div class="method-toppings">Handful mixed berries, 1 tsp raw honey, zest of ½ lemon, optional: 1 tbsp kefir drizzled over</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Separate the egg. Mix ricotta, egg yolk, oat flour, baking powder, vanilla and salt until just combined — don't overwork. Whisk egg white in a separate bowl to soft peaks. Gently fold egg white into the ricotta mixture in two additions to keep them light and fluffy. Heat a non-stick pan over medium-low, add a small knob of butter or drop of olive oil. Spoon 2–3 heaped tbsp per pancake. Cook 2–3 mins each side until golden and puffed. Serve with berries, honey drizzle, lemon zest and a swirl of kefir for a gut bonus.</div>
+          </div>
+        </div>
+        <div class="meal-card" style="--accent:#2a6674">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">☀️</span><span class="meal-type-label">Lunch</span><span class="pill pill-count">for 1</span></div>
+            <div class="meal-name">Roasted Red Pepper Gazpacho with Rye Sourdough</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 8g</span><span class="macro-badge macro-f">Fibre 10g</span><span class="macro-badge macro-c">Carbs 32g</span></div>
+            <div class="gut-note">🦠 Raw tomatoes and peppers retain maximum polyphenols; cold soup is deeply hydrating</div>
+            <div class="extra-note">⚡ Make the night before — zero effort on Sunday</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">3 ripe tomatoes, 1 roasted red pepper (jar), ½ cucumber, ¼ red onion, 1 garlic clove, 1–2 slices rye sourdough<div class="method-toppings">2 tbsp extra virgin olive oil, 1 tbsp red wine vinegar, salt &amp; pepper, torn basil and olive oil to serve</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Entirely raw. Roughly chop tomatoes, cucumber and red onion. Blitz in a blender with roasted pepper, garlic, olive oil, vinegar and seasoning until very smooth. Refrigerate at least 30 mins — or make the night before. Serve in a wide bowl, drizzle olive oil, tear basil over. Toast sourdough alongside.</div>
+          </div>
+        </div>
+        <div class="meal-card" style="--accent:#2a6674">
+          <div class="meal-top">
+            <div class="meal-meta"><span class="meal-type-icon">🌙</span><span class="meal-type-label">Dinner</span><span class="pill pill-count">for 2</span></div>
+            <div class="meal-name">Grilled Chicken Breast with Warm Puy Lentil, Courgette &amp; Feta Salad</div>
+            <div class="macro-row"><span class="macro-badge macro-p">Protein 52g</span><span class="macro-badge macro-f">Fibre 14g</span><span class="macro-badge macro-c">Carbs 44g</span></div>
+            <div class="gut-note">🦠 Puy lentils are outstanding for gut bacteria; dressed while hot they absorb flavour and nutrients more effectively</div>
+          </div>
+          <button class="method-btn" onclick="toggleMethod(this)"><span>📋 PORTIONS &amp; METHOD</span><span class="method-chevron">⌄</span></button>
+          <div class="method-body">
+            <div class="method-label">Portions</div>
+            <div class="method-portions">Per person: 1 large chicken breast (200g), 80g dry puy lentils, 1 courgette, 30g feta, 2 handfuls rocket<div class="method-toppings">Dressing: 2 tbsp olive oil, 1 tbsp lemon juice, 1 tsp Dijon mustard, 1 garlic clove crushed. Marinade: olive oil, lemon zest, dried oregano</div></div>
+            <div class="method-label">Method</div>
+            <div class="method-instructions">Cook lentils: simmer in unsalted water 18–20 mins until just tender, drain. Slice courgettes into ribbons. Griddle or roast at 200°C 15 mins until charred. Marinate chicken in olive oil, lemon zest and oregano. Grill 5–6 mins each side, rest 5 mins. Whisk dressing. Toss warm lentils and courgette with dressing while still hot. Plate lentil salad, lay sliced chicken over, crumble feta, scatter rocket.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end tab-plan -->
+
+  <!-- SHOPPING TAB -->
+  <div id="tab-shopping" class="tab-panel">
+    <div class="info-box green">
+      <strong>Tap any item to check it off</strong> as you shop. Quantities are combined across the whole week — no duplicates.
+    </div>
+
+    <div class="shop-cat">
+      <div class="shop-cat-title">🌾 Grains, Legumes &amp; Pulses</div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Rolled oats</div><div class="shop-item-qty">Large bag — 450g minimum</div><div class="shop-item-note">Mon ×2 (80g pp) + Tue–Sat ×1 (50g each) + blitz 30g for Sun pancakes</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Quinoa</div><div class="shop-item-qty">120g</div><div class="shop-item-note">Tue dinner (60g) + doubles for Wed lunch</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Soba noodles (buckwheat)</div><div class="shop-item-qty">100g</div><div class="shop-item-note">Sat lunch</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Puy lentils</div><div class="shop-item-qty">200g</div><div class="shop-item-note">Sun dinner</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Rye sourdough loaf</div><div class="shop-item-qty">1 loaf</div><div class="shop-item-note">Flour, water, salt, starter only — check label</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Chickpeas (tins)</div><div class="shop-item-qty">3 tins</div><div class="shop-item-note">Mon lunch, Fri lunch, Fri &amp; Sat dinners</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Butter beans (tin)</div><div class="shop-item-qty">1 tin</div><div class="shop-item-note">Wed dinner + Thu lunch</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Black beans (tin)</div><div class="shop-item-qty">1 tin</div><div class="shop-item-note">Sat dinner — use ½ tin, save rest</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Chopped tomatoes (tin)</div><div class="shop-item-qty">1 tin</div><div class="shop-item-note">Wed shakshuka</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Edamame (frozen)</div><div class="shop-item-qty">1 bag</div><div class="shop-item-note">Thu dinner</div></div></div>
+    </div>
+
+    <div class="shop-cat">
+      <div class="shop-cat-title">🥩 Protein &amp; Dairy</div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Chicken breasts</div><div class="shop-item-qty">6 large (approx 200g each)</div><div class="shop-item-note">Mon ×2 + 2 extra for Tue, Sun ×2</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Cod fillet</div><div class="shop-item-qty">1 fillet (180–200g)</div><div class="shop-item-note">Thu dinner only</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Eggs</div><div class="shop-item-qty">3</div><div class="shop-item-note">Wed shakshuka ×2, Sun pancakes ×1</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Halloumi</div><div class="shop-item-qty">125g</div><div class="shop-item-note">Tue dinner — milk, salt only</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Feta</div><div class="shop-item-qty">100g</div><div class="shop-item-note">Fri dinner + Sun dinner — Odysea is clean</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Kefir (plain)</div><div class="shop-item-qty">500ml</div><div class="shop-item-note">Mon oats + Sun pancake drizzle</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Ricotta</div><div class="shop-item-qty">125g</div><div class="shop-item-note">Sun breakfast pancakes</div></div></div>
+    </div>
+
+    <div class="shop-cat">
+      <div class="shop-cat-title">🥛 Dairy Alternatives</div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Oat milk</div><div class="shop-item-qty">2 large cartons</div><div class="shop-item-note">Daily oats all week</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Coconut milk (tinned, full fat)</div><div class="shop-item-qty">1 small tin</div><div class="shop-item-note">Thu oats</div></div></div>
+    </div>
+
+    <div class="shop-cat">
+      <div class="shop-cat-title">🥦 Fresh Vegetables</div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Avocado</div><div class="shop-item-qty">3</div><div class="shop-item-note">Fri lunch, Sat dinner ×2</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Cherry tomatoes</div><div class="shop-item-qty">2 punnets</div><div class="shop-item-note">Mon lunch, Tue dinner, Thu lunch</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Cos lettuce</div><div class="shop-item-qty">1 head</div><div class="shop-item-note">Sat dinner taco cups</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Courgette</div><div class="shop-item-qty">2</div><div class="shop-item-note">Sun dinner</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Cucumber</div><div class="shop-item-qty">4</div><div class="shop-item-note">Mon lunch+dinner, Tue lunch, Thu dinner, Sun gazpacho</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Mixed salad leaves</div><div class="shop-item-qty">1 bag</div><div class="shop-item-note">Mon dinner fattoush</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Radishes</div><div class="shop-item-qty">1 bunch</div><div class="shop-item-note">Mon dinner fattoush</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Red onion</div><div class="shop-item-qty">3</div><div class="shop-item-note">Wed shakshuka, Sat salsa, Sun gazpacho</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Rocket</div><div class="shop-item-qty">3 bags</div><div class="shop-item-note">Mon–Fri lunches &amp; dinners</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Spinach</div><div class="shop-item-qty">1 large bag</div><div class="shop-item-note">Sat lunch bowl</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Spring onions</div><div class="shop-item-qty">1 bunch</div><div class="shop-item-note">Tue tabbouleh, Thu dinner</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Tomatoes (large, ripe)</div><div class="shop-item-qty">3</div><div class="shop-item-note">Sun gazpacho</div></div></div>
+    </div>
+
+    <div class="shop-cat">
+      <div class="shop-cat-title">🍓 Fresh Fruit</div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Apple</div><div class="shop-item-qty">1</div><div class="shop-item-note">Mon oats</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Banana</div><div class="shop-item-qty">3</div><div class="shop-item-note">Wed oats ×2, Sun oats ×1</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Blueberries</div><div class="shop-item-qty">1 punnet</div><div class="shop-item-note">Tue oats</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Lemon</div><div class="shop-item-qty">4</div><div class="shop-item-note">Mon marinade, Tue tabbouleh, Thu lunch, Sun dinner</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Lime</div><div class="shop-item-qty">4</div><div class="shop-item-note">Tue lunch, Thu dinner, Fri dinner, Sat lunch+dinner</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Mango</div><div class="shop-item-qty">3</div><div class="shop-item-note">Tue lunch, Thu oats, Sat salsa + Sun oats</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Mixed berries</div><div class="shop-item-qty">1 punnet</div><div class="shop-item-note">Sun pancake topping</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Pomegranate seeds</div><div class="shop-item-qty">1 small pack</div><div class="shop-item-note">Wed lunch</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Raspberries</div><div class="shop-item-qty">1 punnet</div><div class="shop-item-note">Fri oats</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Strawberries</div><div class="shop-item-qty">1 punnet</div><div class="shop-item-note">Sat oats</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Watermelon</div><div class="shop-item-qty">½ small (approx 400g)</div><div class="shop-item-note">Fri dinner</div></div></div>
+    </div>
+
+    <div class="shop-cat">
+      <div class="shop-cat-title">🥜 Nuts, Seeds &amp; Healthy Fats</div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Almond butter (100% almonds)</div><div class="shop-item-qty">1 jar</div><div class="shop-item-note">Wed oats — no additives</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Chia seeds</div><div class="shop-item-qty">1 packet</div><div class="shop-item-note">Tue oats, Sat oats</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Coconut flakes (toasted)</div><div class="shop-item-qty">1 small bag</div><div class="shop-item-note">Thu oats</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Extra virgin olive oil</div><div class="shop-item-qty">1 large bottle</div><div class="shop-item-note">Used daily throughout</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Hemp seeds</div><div class="shop-item-qty">1 packet</div><div class="shop-item-note">Fri oats</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Olives (in brine — no additives)</div><div class="shop-item-qty">1 jar</div><div class="shop-item-note">Mon lunch mezze</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Pecans</div><div class="shop-item-qty">Small bag</div><div class="shop-item-note">Mon oats</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Pumpkin seeds</div><div class="shop-item-qty">Small bag</div><div class="shop-item-note">Tue lunch</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Sesame oil (cold-pressed)</div><div class="shop-item-qty">1 bottle</div><div class="shop-item-note">Thu dinner, Sat lunch</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Sesame seeds</div><div class="shop-item-qty">Small bag</div><div class="shop-item-note">Thu dinner, Sat lunch</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Tahini</div><div class="shop-item-qty">1 jar</div><div class="shop-item-note">Mon lunch hummus dressing</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Walnuts</div><div class="shop-item-qty">Small bag</div><div class="shop-item-note">Tue oats</div></div></div>
+    </div>
+
+    <div class="shop-cat">
+      <div class="shop-cat-title">🌿 Herbs &amp; Fresh Aromatics</div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Basil (fresh)</div><div class="shop-item-qty">1 bunch</div><div class="shop-item-note">Sun gazpacho</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Flat-leaf parsley (fresh)</div><div class="shop-item-qty">1 bunch</div><div class="shop-item-note">Tue tabbouleh, Thu lunch</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Garlic</div><div class="shop-item-qty">2 bulbs</div><div class="shop-item-note">Multiple meals all week</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Ginger root (fresh)</div><div class="shop-item-qty">1 thumb-sized piece</div><div class="shop-item-note">Thu dinner</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Mint (fresh)</div><div class="shop-item-qty">2 bunches</div><div class="shop-item-note">Mon dinner, Tue tabbouleh, Thu lunch, Sat salsa</div></div></div>
+    </div>
+
+    <div class="shop-cat">
+      <div class="shop-cat-title">🫙 Jars, Spices &amp; Condiments</div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Chipotle flakes or powder</div><div class="shop-item-qty">1 small jar</div><div class="shop-item-note">Sat dinner</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Chilli flakes</div><div class="shop-item-qty">1 jar</div><div class="shop-item-note">Multiple meals</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Cinnamon</div><div class="shop-item-qty">1 jar</div><div class="shop-item-note">Mon oats</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Cumin</div><div class="shop-item-qty">1 jar</div><div class="shop-item-note">Wed, Fri &amp; Sat dinners</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Dijon mustard (clean label)</div><div class="shop-item-qty">1 jar</div><div class="shop-item-note">Sun dinner — mustard seeds, vinegar, salt only</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Dried oregano</div><div class="shop-item-qty">1 jar</div><div class="shop-item-note">Mon dinner, Sun dinner</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Maple syrup (pure)</div><div class="shop-item-qty">1 bottle</div><div class="shop-item-note">Mon oats</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Raw honey</div><div class="shop-item-qty">1 jar</div><div class="shop-item-note">Tue, Thu, Fri oats + dressings + Sun pancakes</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Red wine vinegar</div><div class="shop-item-qty">1 bottle</div><div class="shop-item-note">Mon dinner, Sun gazpacho</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Roasted red peppers (jar)</div><div class="shop-item-qty">2 jars</div><div class="shop-item-note">Wed shakshuka, Fri lunch, Sun gazpacho — Fragata is clean</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Smoked paprika</div><div class="shop-item-qty">1 jar</div><div class="shop-item-note">Mon lunch, Wed &amp; Fri dinners</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Sumac</div><div class="shop-item-qty">1 small jar</div><div class="shop-item-note">Mon dinner — transformative, worth finding</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Tamari (gluten-free)</div><div class="shop-item-qty">1 bottle</div><div class="shop-item-note">Thu dinner, Sat lunch — soybeans, water, salt only</div></div></div>
+    </div>
+
+    <div class="shop-cat">
+      <div class="shop-cat-title">🍫 Baking &amp; Extras</div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Baking powder</div><div class="shop-item-qty">Check stocks — 1 tsp needed</div><div class="shop-item-note">Sun pancakes</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Dark chocolate 85%+</div><div class="shop-item-qty">1 small bar</div><div class="shop-item-note">Wed oats</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Vanilla extract (pure)</div><div class="shop-item-qty">Check stocks</div><div class="shop-item-note">Sun pancakes</div></div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-circle"><svg class="shop-check-svg" width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="shop-item-name">Sea salt &amp; black pepper</div><div class="shop-item-qty">Check stocks</div><div class="shop-item-note"></div></div></div>
+    </div>
+
+    <div class="principles-box">
+      <h3>🌿 Tim Spector Principles Applied</h3>
+      <ul>
+        <li><strong>30+ plant points</strong> across the week — herbs and spices all count</li>
+        <li><strong>Fermented foods daily:</strong> kefir in oats, sourdough rye throughout</li>
+        <li><strong>4 veggie dinners</strong> — halloumi, shakshuka, watermelon feta, black bean tacos</li>
+        <li><strong>Cod once only</strong> — Thursday sesame-crusted with cucumber noodles</li>
+        <li><strong>No ultra-processed wraps</strong> — cos lettuce cups on Saturday</li>
+        <li><strong>EVOO daily</strong> — richest everyday polyphenol source</li>
+        <li><strong>Sunday ricotta pancakes</strong> — whey protein from ricotta, kefir drizzle keeps the gut benefits</li>
+      </ul>
+    </div>
+
+  </div><!-- end tab-shopping -->
+
+</div><!-- end content -->
+
+<script>
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function toggleDay(btn) {
+    const body = btn.nextElementSibling;
+    const isOpen = btn.classList.contains('open');
+    btn.classList.toggle('open', !isOpen);
+    body.classList.toggle('open', !isOpen);
+  }
+
+  function toggleMethod(btn) {
+    const body = btn.nextElementSibling;
+    const isOpen = btn.classList.contains('open');
+    btn.classList.toggle('open', !isOpen);
+    body.classList.toggle('open', !isOpen);
+  }
+
+  function toggleShop(el) {
+    el.classList.toggle('checked');
+  }
+</script>
+</body>
+</html>
