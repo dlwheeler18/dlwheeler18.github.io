@@ -1,1 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Meal Plan</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green-deep:#1a2e1a;--green-mid:#2d4a2d;--green-accent:#86bc4a;
+  --green-soft:#a3c98a;--cream:#fafaf7;--warm:#f0ede6;
+  --ink:#2a2010;--muted:#7a6a50;--rule:#e8e2d8;
+}
+body{font-family:'Inter',sans-serif;background:linear-gradient(160deg,#fafaf7 0%,#f0ede6 100%);min-height:100vh;color:#2a2010}
+.header{background:linear-gradie<nt(135deg,#1a2e1a 0%,#2d4a2d 55%,#1a3322 100%);padding:2.5rem 1.5rem 0;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 15% 50%,rgba(74,124,89,.35) 0%,transparent 55%),radial-gradient(circle at 85% 20%,rgba(134,188,74,.2) 0%,transparent 45%);pointer-events:none}
+.header-inner{position:relative;max-width:900px;margin:0 auto}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.eyebrow{font-size:10px;letter-spacing:4px;color:#86bc4a;text-transform:uppercase;margin-bottom:8px}
+.header-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);color:#fff;font-weight:400;line-height:1.1}
+.header-sub{color:#a3c98a;margin-top:6px;font-size:.83rem;line-height:1.6}
+.header-stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat-box{background:rgba(255,255,255,.07);border:1px solid rgba(134,188,74,.25);border-radius:10px;padding:.7rem 1rem;text-align:center;min-width:90px}
+.stat-val{font-size:1.4rem;font-weight:700;color:#86bc4a;line-height:1}
+.stat-label{font-size:9px;color:#a3c98a;text-transform:uppercase;letter-spacing:1.5px;margin-top:2px}
+.stat-sub{font-size:9px;color:#6b9e5a;margin-top:1px}
+.highlights{display:flex;gap:8px;flex-wrap:wrap;margin-top:1.4rem;padding-bottom:1.2rem}
+.pill{background:rgba(255,255,255,.08);border:1px solid rgba(134,188,74,.2);border-radius:20px;padding:5px 12px;font-size:11px;color:#a3c98a;white-space:nowrap}
+.tabs{display:flex;gap:2px;margin-top:.8rem}
+.tab-btn{padding:.55rem 1.1rem;border-radius:6px 6px 0 0;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:.75rem;letter-spacing:.5px;text-transform:uppercase;transition:all .2s;background:rgba(255,255,255,.08);color:#a3c98a;font-weight:400}
+.tab-btn.active{background:#fafaf7;color:#1a2e1a;font-weight:600}
+.main{max-width:900px;margin:0 auto;padding:1.5rem 1rem 3rem}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.day-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.2rem}
+.day-btn{padding:.4rem 1rem;border-radius:20px;border:2px solid #e8e2d8;background:#fff;color:#5a5040;cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;transition:all .18s}
+.day-btn.active{border-color:#2d4a2d;background:#2d4a2d;color:#fff;font-weight:600}
+.day-panel{display:none}.day-panel.active{display:flex;flex-direction:column;gap:.85rem}
+.meal-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.05);border:1px solid #e8e2d8;transition:all .22s;cursor:pointer}
+.meal-card.open{box-shadow:0 6px 28px rgba(0,0,0,.09)}
+.meal-header{padding:1rem 1.2rem;display:flex;align-items:center;gap:.75rem}
+.emoji-box{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0}
+.meal-meta{flex:1;min-width:0}
+.badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px}
+.badge{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border-radius:8px}
+.badge-grey{background:#f5f0e8;color:#7a6a50}
+.badge-green{background:#e8f5e9;color:#4a7c59}
+.meal-title{font-family:'Playfair Display',serif;font-weight:600;color:#2a2010;font-size:.95rem;line-height:1.3}
+.toggle-btn{width:26px;height:26px;border-radius:50%;background:#f0ede6;display:flex;align-items:center;justify-content:center;color:#5a5040;font-size:16px;flex-shrink:0;transition:all .2s;border:none;line-height:1;font-family:'Inter',sans-serif}
+.meal-card.open .toggle-btn{background:#2d4a2d;color:#fff}
+.meal-body{display:none;border-top:1px solid #f5f0ea;padding:1.1rem 1.2rem}
+.meal-card.open .meal-body{display:block}
+.recipe-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+@media(max-width:540px){.recipe-grid{grid-template-columns:1fr}}
+.section-label{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px}
+.ing-list,.step-list{list-style:none}
+.ing-item{display:flex;align-items:flex-start;gap:7px;margin-bottom:5px;font-size:.81rem;color:#3a3020;line-height:1.45}
+.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.step-item{display:flex;gap:8px;margin-bottom:6px;font-size:.81rem;color:#3a3020;line-height:1.45}
+.step-num{width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;font-weight:700}
+.tip{margin-top:1rem;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:.65rem .85rem;display:flex;gap:8px;font-size:.8rem;color:#78350f;line-height:1.55}
+.panel-card{background:#fff;border-radius:12px;padding:1.4rem;border:1px solid #e8e2d8;margin-bottom:1rem}
+.panel-eyebrow{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:1rem}
+.who-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.7rem;margin-bottom:1rem}
+.who-card{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.85rem}
+.who-label{font-weight:600;color:#1d4ed8;font-size:.83rem}
+.who-value{font-size:.95rem;color:#1e3a8a;font-weight:700;margin-top:3px}
+.who-detail{font-size:.71rem;color:#3b82f6;margin-top:4px;line-height:1.4}
+.spector-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:7px;font-size:.86rem;color:#2a3a2a;line-height:1.55}
+.spector-star{color:#16a34a;flex-shrink:0}
+.stats-dark{background:linear-gradient(135deg,#1a2e1a,#2d4a2d);border-radius:12px;padding:1.4rem;margin-bottom:1rem}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-top:.5rem}
+.stat-item{text-align:center}
+.stat-big{font-size:1.6rem;font-weight:700;color:#86bc4a}
+.stat-name{font-size:.75rem;color:#c8e6c9;margin-top:2px}
+.stat-desc{font-size:.68rem;color:#6b9e5a;margin-top:2px}
+.oats-row{display:flex;gap:10px;align-items:center;padding:.5rem 0;border-bottom:1px solid #f5f0ea;font-size:.83rem}
+.oats-row:last-child{border-bottom:none}
+.oats-day{font-size:9px;font-weight:700;letter-spacing:1px;color:#EA580C;background:#FFF7ED;padding:2px 8px;border-radius:8px;min-width:75px;text-align:center}
+.oats-title{font-weight:600;color:#2a2010;min-width:180px}
+.oats-note{font-size:.78rem;color:#7a6a50}
+.kcal-card{background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:.85rem}
+.kcal-label{font-weight:600;color:#6d28d9;font-size:.83rem}
+.kcal-value{font-size:.95rem;color:#4c1d95;font-weight:700;margin-top:3px}
+.kcal-detail{font-size:.71rem;color:#7c3aed;margin-top:4px;line-height:1.4}
+.shop-controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
+.shop-title{font-weight:600;font-size:.85rem}
+.shop-subtitle{font-size:.75rem;color:#9a8070;margin-top:2px}
+.shop-right{display:flex;gap:8px;align-items:center}
+.progress-bar{height:6px;width:100px;background:#e8e2d8;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:#4a7c59;border-radius:3px;transition:width .3s;width:0%}
+.reset-btn{font-size:.72rem;color:#9a8070;background:none;border:1px solid #d5cfc5;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Inter',sans-serif}
+.shop-group{background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e8e2d8;margin-bottom:.7rem;transition:all .2s}
+.shop-group.done{background:#f0fdf4;border-color:#bbf7d0}
+.group-header{padding:.6rem 1rem;background:#f7f3ee;border-bottom:1px solid #e8e2d8;display:flex;align-items:center;gap:8px}
+.shop-group.done .group-header{background:#dcfce7;border-color:#bbf7d0}
+.group-name{font-weight:700;font-size:.88rem}
+.group-count{margin-left:auto;font-size:10px;color:#9a8070}
+.shop-group.done .group-count{color:#16a34a;font-weight:700}
+.shop-item{width:100%;display:flex;align-items:center;gap:10px;padding:.45rem 1rem;background:transparent;border:none;cursor:pointer;text-align:left;border-bottom:1px solid #f5f0ea;transition:background .15s;font-family:'Inter',sans-serif}
+.shop-item:last-child{border-bottom:none}
+.shop-item.checked{background:#f0fdf4}
+.checkbox{width:18px;height:18px;border-radius:4px;flex-shrink:0;border:2px solid #c8c0b0;background:transparent;display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:10px;color:#fff}
+.shop-item.checked .checkbox{background:#16a34a;border-color:#16a34a}
+.item-text{font-size:.81rem;color:#3a3020;line-height:1.45;transition:all .15s}
+.shop-item.checked .item-text{color:#6b9e5a;text-decoration:line-through}
+@media(max-width:600px){.header{padding:1.5rem 1rem 0}.oats-note{display:none}.oats-title{min-width:unset}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div>
+        <div class="eyebrow">Gut-Healthy &middot; WHO Macro-Aligned &middot; No UPF</div>
+        <h1 class="header-title">Week 3<br>7 Day Healthy Meal Plan</h1>
+        <div class="header-sub">No fish &middot; No pork &middot; No coriander &middot; Oat milk &middot; Chicken breast</div>
+      </div>
+      <div class="header-stats">
+        <div class="stat-box"><div class="stat-val">76</div><div class="stat-label">Plant Points</div><div class="stat-sub">Target 30+ ✓</div></div>
+        <div class="stat-box"><div class="stat-val">Daily</div><div class="stat-label">Fermented Foods</div><div class="stat-sub">Gut diversity</div></div>
+        <div class="stat-box"><div class="stat-val">1,662</div><div class="stat-label">Avg kcal/day</div><div class="stat-sub">~0.3kg/wk loss</div></div>
+      </div>
+    </div>
+    <div class="highlights">
+      <span class="pill">🌿 Plant Packed</span><span class="pill">🫙 Ferment Daily</span><span class="pill">🚫 Zero UPF</span>
+      <span class="pill">⏱ Lazy Mornings</span><span class="pill">⚖️ Balanced by Design</span><span class="pill">📉 Steady &amp; Sustainable</span>
+      <span class="pill">🍗 Lean Protein</span><span class="pill">🥣 No Fuss Lunches</span><span class="pill">🌍 Global Flavours</span>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('plan',this)">🗓 Meal Plan</button>
+      <button class="tab-btn" onclick="switchTab('guidelines',this)">📋 Guidelines</button>
+      <button class="tab-btn" id="shop-tab-btn" onclick="switchTab('shopping',this)">🛒 Shopping</button>
+    </div>
+  </div>
+</div>
+<div class="main">
+  <div id="tab-plan" class="tab-panel active">
+    <div class="day-nav"><button class="day-btn active" onclick="switchDay(0,this)">Monday</button><button class="day-btn" onclick="switchDay(1,this)">Tuesday</button><button class="day-btn" onclick="switchDay(2,this)">Wednesday</button><button class="day-btn" onclick="switchDay(3,this)">Thursday</button><button class="day-btn" onclick="switchDay(4,this)">Friday</button><button class="day-btn" onclick="switchDay(5,this)">Saturday</button><button class="day-btn" onclick="switchDay(6,this)">Sunday</button></div><div id="day-0" class="day-panel active">
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#FFF7ED">🌅</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#FFF7ED;color:#EA580C">Breakfast</span><span class="badge badge-grey">1 person</span><span class="badge badge-green">🌿 6 plants</span><span class="badge badge-grey">⏱ Prep tonight</span></div>
+          <div class="meal-title">Classic Berry &amp; Chia Overnight Oats</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#EA580C">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#FB923C"></span>50g rolled oats</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>150ml oat milk</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tbsp chia seeds</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tbsp mixed seeds (pumpkin, sunflower)</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>80g mixed berries (fresh or frozen)</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tsp raw honey</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>&frac12; tsp cinnamon</li></ul></div>
+          <div><div class="section-label" style="color:#EA580C">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">1</span>Combine oats, oat milk and chia seeds in a jar or bowl.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">2</span>Stir in honey and cinnamon.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">3</span>Seal and refrigerate overnight (min. 6 hrs).</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">4</span>In the morning, top with berries and mixed seeds.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">5</span>Add a splash more oat milk to loosen if needed.</li></ol></div>
+        </div>
+        <div class="tip">💡 Prep takes 3 minutes the night before &mdash; zero morning effort. Serve alongside a small pot of live yoghurt for a daily fermented food hit.</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#F0FDF4">☀️</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#F0FDF4;color:#16A34A">Lunch</span><span class="badge badge-grey">2 people</span><span class="badge badge-green">🌿 7 plants</span><span class="badge badge-grey">⏱ 10 mins</span></div>
+          <div class="meal-title">Smashed Butter Bean &amp; Avocado Toast</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#16A34A">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 &times; 400g tin butter beans, drained</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 ripe avocado</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Juice of 1 lemon</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 tsp smoked paprika</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Salt &amp; pepper</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>2 slices sourdough bread</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Handful of rocket</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>6 cherry tomatoes, halved</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>&frac12; cucumber, sliced</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Pinch of chilli flakes</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Drizzle of extra virgin olive oil</li></ul></div>
+          <div><div class="section-label" style="color:#16A34A">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">1</span>Drain and rinse butter beans. Place in a bowl.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">2</span>Add avocado, lemon juice, paprika, salt &amp; pepper.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">3</span>Smash together with a fork &mdash; keep it chunky.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">4</span>Toast the sourdough slices.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">5</span>Spread smashed bean mix generously over each slice.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">6</span>Top with rocket, cherry tomatoes and cucumber.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">7</span>Finish with chilli flakes and a drizzle of olive oil.</li></ol></div>
+        </div>
+        <div class="tip">💡 Make the smash the night before and refrigerate &mdash; toast the bread at lunchtime and it&rsquo;s ready in 2 minutes. Sourdough is fermented, a gut-health bonus.</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#EFF6FF">🌙</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#EFF6FF;color:#2563EB">Dinner</span><span class="badge badge-grey">2 people</span><span class="badge badge-green">🌿 7 plants</span><span class="badge badge-grey">⏱ 35 mins</span></div>
+          <div class="meal-title">Chicken Breast &amp; Chickpea Harissa Traybake</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#2563EB">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>2 chicken breasts</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 &times; 400g tin chickpeas, drained</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 &times; 400g tin chopped tomatoes</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>2 tbsp harissa paste (check label &mdash; no UPF)</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 red onion, cut into wedges</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 red pepper, sliced</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>3 garlic cloves, crushed</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>2 tbsp olive oil</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 tsp cumin</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>Handful of spinach to wilt in at end</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>Fresh parsley to serve</li></ul></div>
+          <div><div class="section-label" style="color:#2563EB">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">1</span>Preheat oven to 200&deg;C.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">2</span>Mix harissa, olive oil, garlic and cumin in a large bowl.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">3</span>Add chicken breasts, chickpeas, onion, pepper. Toss to coat.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">4</span>Pour tomatoes into roasting dish. Add everything on top.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">5</span>Roast 25&ndash;30 mins until chicken is cooked through (75&deg;C internal).</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">6</span>Stir in spinach for the final 2 mins.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">7</span>Scatter parsley and serve straight from the dish.</li></ol></div>
+        </div>
+        <div class="tip">💡 Serve each person an extra slice of sourdough alongside to boost carbs. Breast cooks faster than thigh &mdash; check at 25 mins and use a thermometer.</div>
+      </div>
+    </div></div><div id="day-1" class="day-panel">
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#FFF7ED">🌅</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#FFF7ED;color:#EA580C">Breakfast</span><span class="badge badge-grey">1 person</span><span class="badge badge-green">🌿 5 plants</span><span class="badge badge-grey">⏱ Prep tonight</span></div>
+          <div class="meal-title">Banana &amp; Walnut Overnight Oats</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#EA580C">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#FB923C"></span>50g rolled oats</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>150ml oat milk</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tbsp chia seeds</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>&frac12; ripe banana, mashed</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>20g walnuts, roughly chopped</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tbsp ground flaxseed</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>&frac12; tsp cinnamon</li></ul></div>
+          <div><div class="section-label" style="color:#EA580C">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">1</span>Combine oats, oat milk and chia seeds in a jar.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">2</span>Mash the banana and stir it through &mdash; it naturally sweetens the oats.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">3</span>Seal and refrigerate overnight.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">4</span>In the morning, top with walnuts and flaxseed.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">5</span>Add a splash more oat milk to loosen if needed.</li></ol></div>
+        </div>
+        <div class="tip">💡 Mashed banana ferments very slightly overnight, adding a deeper flavour. Walnuts are rich in omega-3s and polyphenols.</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#F0FDF4">☀️</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#F0FDF4;color:#16A34A">Lunch</span><span class="badge badge-grey">1 person</span><span class="badge badge-green">🌿 8 plants</span><span class="badge badge-grey">⏱ 15 mins</span></div>
+          <div class="meal-title">Miso Noodle Soup with Greens &amp; Edamame</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#16A34A">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 tbsp white miso paste</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>500ml hot water (not boiling)</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>80g soba (buckwheat) noodles</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>80g frozen edamame, defrosted</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>100g green beans, trimmed</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>2 spring onions, sliced</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 tsp sesame oil</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 tsp low-sodium soy sauce</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 tsp fresh ginger, grated</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 garlic clove, thinly sliced</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 tsp sesame seeds</li></ul></div>
+          <div><div class="section-label" style="color:#16A34A">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">1</span>Cook soba noodles per pack (usually 5 mins). Drain and rinse.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">2</span>Gently fry garlic and ginger in sesame oil for 1 min.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">3</span>Add hot water then whisk in miso &mdash; don&rsquo;t boil, it kills probiotics.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">4</span>Add green beans and edamame. Simmer 2 mins.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">5</span>Add soy sauce. Taste and adjust.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">6</span>Pour over noodles in a bowl.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">7</span>Top with spring onions and sesame seeds.</li></ol></div>
+        </div>
+        <div class="tip">💡 Never boil miso &mdash; the beneficial bacteria are heat-sensitive. One of the quickest, most gut-friendly lunches in the plan.</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#EFF6FF">🌙</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#EFF6FF;color:#2563EB">Dinner</span><span class="badge badge-grey">1 person</span><span class="badge badge-green">🌿 6 plants</span><span class="badge badge-grey">⏱ 30 mins</span></div>
+          <div class="meal-title">Spiced Lamb Kofta with Bulgur &amp; Yoghurt</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#2563EB">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>150g lamb mince</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>&frac12; tsp cumin, &frac12; tsp coriander powder</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>&frac14; tsp cinnamon, &frac14; tsp smoked paprika</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>80g bulgur wheat (dry weight)</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>&frac12; cucumber, diced</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>6 cherry tomatoes, halved</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>3 tbsp natural live yoghurt</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 tsp lemon juice</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>Fresh mint, chopped</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 tbsp olive oil</li></ul></div>
+          <div><div class="section-label" style="color:#2563EB">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">1</span>Cook bulgur: pour 160ml boiling water over, cover and leave 15 mins.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">2</span>Mix lamb with all spices, salt &amp; pepper. Shape into 3&ndash;4 small koftas.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">3</span>Heat olive oil in a pan over medium-high heat.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">4</span>Cook koftas 8&ndash;10 mins, turning, until browned and cooked through.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">5</span>Mix yoghurt with lemon juice and a pinch of salt.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">6</span>Fluff bulgur with a fork. Stir in cucumber, tomatoes, mint.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">7</span>Serve koftas on bulgur, drizzle with yoghurt.</li></ol></div>
+        </div>
+        <div class="tip">💡 Live yoghurt contains beneficial bacteria &mdash; choose one labelled &lsquo;live cultures&rsquo;. Bulgur rehydrates hands-free while the koftas cook.</div>
+      </div>
+    </div></div><div id="day-2" class="day-panel">
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#FFF7ED">🌅</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#FFF7ED;color:#EA580C">Breakfast</span><span class="badge badge-grey">1 person</span><span class="badge badge-green">🌿 5 plants</span><span class="badge badge-grey">⏱ Prep tonight</span></div>
+          <div class="meal-title">Peanut Butter &amp; Apple Overnight Oats</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#EA580C">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#FB923C"></span>50g rolled oats</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>150ml oat milk</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tbsp chia seeds</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tbsp natural peanut butter (peanuts only)</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>&frac12; apple, grated</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tsp raw honey</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>Pinch of cinnamon</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tbsp mixed seeds to top</li></ul></div>
+          <div><div class="section-label" style="color:#EA580C">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">1</span>Combine oats, oat milk and chia seeds in a jar.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">2</span>Stir in peanut butter, grated apple, honey and cinnamon.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">3</span>Seal and refrigerate overnight.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">4</span>In the morning, top with mixed seeds.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">5</span>Stir well before eating &mdash; the peanut butter thickens overnight.</li></ol></div>
+        </div>
+        <div class="tip">💡 Grated apple adds pectin &mdash; a prebiotic fibre that feeds good gut bacteria. Natural peanut butter should list only peanuts (and maybe salt).</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#F0FDF4">☀️</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#F0FDF4;color:#16A34A">Lunch</span><span class="badge badge-grey">1 person</span><span class="badge badge-green">🌿 6 plants</span><span class="badge badge-grey">⏱ 5 mins</span></div>
+          <div class="meal-title">Speedy Lentil &amp; Tomato Soup (from leftovers)</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#16A34A">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>~150g cooked lentils (leftover from Mon)</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>400ml vegetable stock (low sodium)</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 carrot, grated</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>&frac12; tin chopped tomatoes</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 tsp cumin, 1 tsp turmeric</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 slice sourdough to serve</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Drizzle of extra virgin olive oil</li></ul></div>
+          <div><div class="section-label" style="color:#16A34A">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">1</span>Add stock and tomatoes to a small pan. Bring to a simmer.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">2</span>Stir in leftover lentils, grated carrot, cumin and turmeric.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">3</span>Simmer 5 mins. Season well.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">4</span>Pour into a bowl, drizzle with olive oil.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">5</span>Serve with sourdough on the side.</li></ol></div>
+        </div>
+        <div class="tip">💡 Grating the carrot means it cooks in minutes with no chopping. Prep a batch of lentils on Sunday to make this even faster.</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#EFF6FF">🌙</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#EFF6FF;color:#2563EB">Dinner</span><span class="badge badge-grey">1 person</span><span class="badge badge-green">🌿 6 plants</span><span class="badge badge-grey">⏱ 35 mins</span></div>
+          <div class="meal-title">Teriyaki Chicken with Brown Rice &amp; Stir-Fried Greens</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#2563EB">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 chicken breast, sliced into strips</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>80g brown rice (dry weight)</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 tbsp soy sauce, 1 tbsp mirin</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 tsp sesame oil, 1 tsp honey, 1 tsp cornflour</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 tsp fresh ginger, grated</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>150g tenderstem broccoli</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>80g frozen edamame, defrosted</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 garlic clove, sliced</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 tbsp sesame seeds, 1 spring onion</li></ul></div>
+          <div><div class="section-label" style="color:#2563EB">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">1</span>Cook brown rice per packet (25&ndash;30 mins). Start this first.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">2</span>Mix soy, mirin, sesame oil, ginger, honey and cornflour for marinade.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">3</span>Slice chicken into strips and toss in marinade. Leave 10 mins.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">4</span>Pan-fry chicken over medium-high heat 6&ndash;8 mins until cooked through (75&deg;C).</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">5</span>Add edamame and broccoli with garlic. Stir-fry 3&ndash;4 mins.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">6</span>Serve over brown rice, pour over remaining sauce.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">7</span>Top with sesame seeds and spring onion.</li></ol></div>
+        </div>
+        <div class="tip">💡 Slicing the breast into strips speeds up cooking and maximises marinade absorption. Don&rsquo;t overcrowd the pan &mdash; single layer for a good sear.</div>
+      </div>
+    </div></div><div id="day-3" class="day-panel">
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#FFF7ED">🌅</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#FFF7ED;color:#EA580C">Breakfast</span><span class="badge badge-grey">1 person</span><span class="badge badge-green">🌿 5 plants</span><span class="badge badge-grey">⏱ Prep tonight</span></div>
+          <div class="meal-title">Mango &amp; Coconut Overnight Oats</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#EA580C">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#FB923C"></span>50g rolled oats</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>120ml oat milk</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>30ml coconut milk (tinned, full fat)</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tbsp chia seeds</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>&frac12; mango, diced (fresh or frozen)</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tbsp desiccated coconut (unsweetened)</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tsp lime juice</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>Pinch of cardamom</li></ul></div>
+          <div><div class="section-label" style="color:#EA580C">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">1</span>Combine oats, oat milk, coconut milk and chia seeds in a jar.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">2</span>Stir in lime juice and cardamom.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">3</span>Seal and refrigerate overnight.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">4</span>In the morning, top with diced mango and coconut.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">5</span>Add a little extra oat milk if too thick.</li></ol></div>
+        </div>
+        <div class="tip">💡 Cardamom is a polyphenol-rich spice &mdash; it counts as a plant point! Coconut milk adds healthy medium-chain fats and a creamy texture.</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#F0FDF4">☀️</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#F0FDF4;color:#16A34A">Lunch</span><span class="badge badge-grey">1 person</span><span class="badge badge-green">🌿 8 plants</span><span class="badge badge-grey">⏱ 10 mins</span></div>
+          <div class="meal-title">Roasted Pepper &amp; Butter Bean Salad with Sourdough</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#16A34A">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 &times; 400g tin butter beans, drained</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>2 roasted red peppers (jarred, in oil)</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Handful of rocket</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>6 sun-dried tomatoes, chopped</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 tbsp olive oil, 1 tbsp red wine vinegar</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 tsp Dijon mustard</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>10g pine nuts, toasted</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Fresh basil leaves</li></ul></div>
+          <div><div class="section-label" style="color:#16A34A">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">1</span>Drain and rinse butter beans. Pat dry.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">2</span>Slice roasted peppers into strips.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">3</span>Toast pine nuts in a dry pan 2&ndash;3 mins &mdash; watch carefully.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">4</span>Whisk olive oil, vinegar and mustard for dressing. Season.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">5</span>Toss beans, peppers, rocket and sun-dried tomatoes with dressing.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">6</span>Top with pine nuts and fresh basil.</li></ol></div>
+        </div>
+        <div class="tip">💡 No cooking required except toasting pine nuts. Sun-dried tomatoes are rich in lycopene and polyphenols &mdash; this salad hits 8 plant points!</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#EFF6FF">🌙</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#EFF6FF;color:#2563EB">Dinner</span><span class="badge badge-grey">1 person</span><span class="badge badge-green">🌿 7 plants</span><span class="badge badge-grey">⏱ 25 mins</span></div>
+          <div class="meal-title">One-Pan Shakshuka with White Beans &amp; Feta</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#2563EB">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>2 eggs</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>&frac12; &times; 400g tin cannellini beans, drained</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>&frac12; &times; 400g tin chopped tomatoes</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>&frac12; red pepper, diced</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>&frac12; red onion, diced</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 garlic clove, &frac12; tsp cumin, &frac12; tsp smoked paprika</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>Pinch of chilli flakes, 1 tbsp olive oil</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>30g feta, crumbled</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>2 tbsp natural live yoghurt to serve</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>Fresh parsley + 1 slice sourdough to serve</li></ul></div>
+          <div><div class="section-label" style="color:#2563EB">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">1</span>Heat olive oil in a frying pan. Fry onion and pepper 5 mins.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">2</span>Add garlic, cumin, paprika and chilli. Cook 1 min.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">3</span>Pour in tomatoes and beans. Simmer 10 mins until thickened. Season.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">4</span>Make 2 wells in the sauce. Crack in the eggs.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">5</span>Cover and cook on low 6&ndash;8 mins &mdash; whites set, yolks runny.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">6</span>Crumble feta over the top.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">7</span>Scatter parsley, serve with yoghurt and sourdough.</li></ol></div>
+        </div>
+        <div class="tip">💡 White beans boost fibre to ~15g and add extra plant-based protein. One pan, minimal washing up. Sauce can be made ahead.</div>
+      </div>
+    </div></div><div id="day-4" class="day-panel">
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#FFF7ED">🌅</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#FFF7ED;color:#EA580C">Breakfast</span><span class="badge badge-grey">1 person</span><span class="badge badge-green">🌿 5 plants</span><span class="badge badge-grey">⏱ Prep tonight</span></div>
+          <div class="meal-title">Chocolate &amp; Hazelnut Overnight Oats</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#EA580C">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#FB923C"></span>50g rolled oats</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>150ml oat milk</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tbsp chia seeds</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tsp raw cacao powder (not cocoa mix)</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>20g hazelnuts, roughly chopped</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tsp raw honey, &frac12; tsp vanilla extract</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>Handful of raspberries to top</li></ul></div>
+          <div><div class="section-label" style="color:#EA580C">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">1</span>Combine oats, oat milk and chia seeds in a jar.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">2</span>Stir in cacao powder, honey and vanilla.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">3</span>Seal and refrigerate overnight.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">4</span>In the morning, top with hazelnuts and raspberries.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">5</span>Stir well before eating.</li></ol></div>
+        </div>
+        <div class="tip">💡 Raw cacao is rich in polyphenols and counts as a plant point. A treat-feeling breakfast that&rsquo;s genuinely good for your gut.</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#F0FDF4">☀️</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#F0FDF4;color:#16A34A">Lunch</span><span class="badge badge-grey">1 person</span><span class="badge badge-green">🌿 8 plants</span><span class="badge badge-grey">⏱ 5 mins</span></div>
+          <div class="meal-title">Smashed Chickpea &amp; Butter Bean Toast</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#16A34A">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>&frac12; &times; 400g tin chickpeas, drained</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>&frac12; &times; 400g tin butter beans, drained</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 tbsp tahini</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Juice of &frac12; lemon, 1 tsp olive oil</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>&frac14; tsp cumin, salt &amp; pepper</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 slice sourdough, toasted</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Handful of rocket or spinach</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>4 cherry tomatoes, halved</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>&frac14; cucumber, sliced</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Pinch of chilli flakes</li></ul></div>
+          <div><div class="section-label" style="color:#16A34A">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">1</span>Drain chickpeas and butter beans. Smash together &mdash; keep chunky.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">2</span>Stir in tahini, lemon juice, olive oil, cumin, salt &amp; pepper.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">3</span>Toast the sourdough.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">4</span>Spread chickpea smash generously over the toast.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">5</span>Add rocket, cherry tomatoes and cucumber.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">6</span>Finish with chilli flakes.</li></ol></div>
+        </div>
+        <div class="tip">💡 Butter beans double the fibre. No cooking needed &mdash; make it the night before and it&rsquo;s a 2-minute lunch.</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#EFF6FF">🌙</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#EFF6FF;color:#2563EB">Dinner</span><span class="badge badge-grey">2 people</span><span class="badge badge-green">🌿 8 plants</span><span class="badge badge-grey">⏱ 45 mins</span></div>
+          <div class="meal-title">Slow-Cooked Beef &amp; Root Vegetable Stew</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#2563EB">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>300g beef braising steak, diced</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>2 medium carrots, chunked</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>2 parsnips, chunked</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 large onion, roughly chopped</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>2 celery stalks, sliced</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>3 garlic cloves, crushed</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>400ml beef stock (low sodium)</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 tbsp tomato pur&eacute;e, 1 tbsp olive oil</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 tsp dried thyme, 1 bay leaf</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>Handful of savoy cabbage, shredded</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>Wholegrain bread or mash to serve</li></ul></div>
+          <div><div class="section-label" style="color:#2563EB">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">1</span>Heat oil in a deep pan. Brown beef in batches 3&ndash;4 mins. Set aside.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">2</span>Fry onion, celery and garlic 5 mins until softened.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">3</span>Add tomato pur&eacute;e and stir 1 min.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">4</span>Return beef. Add stock, carrots, parsnips, thyme, bay leaf.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">5</span>Bring to a boil, reduce heat. Cover and simmer 40 mins.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">6</span>Add savoy cabbage for final 5 mins. Season to taste.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">7</span>Serve with wholegrain bread or mashed potato.</li></ol></div>
+        </div>
+        <div class="tip">💡 Start this at 6pm for a relaxed Friday dinner. Leftovers are even better the next day &mdash; the flavours deepen overnight.</div>
+      </div>
+    </div></div><div id="day-5" class="day-panel">
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#FFF7ED">🌅</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#FFF7ED;color:#EA580C">Breakfast</span><span class="badge badge-grey">2 people</span><span class="badge badge-green">🌿 5 plants</span><span class="badge badge-grey">⏱ 20 mins</span></div>
+          <div class="meal-title">Mushroom &amp; Spinach Omelette with Sourdough</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#EA580C">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#FB923C"></span>4 large eggs</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>150g chestnut mushrooms, sliced</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>100g baby spinach</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 garlic clove, crushed</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>2 tbsp olive oil</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>Salt &amp; pepper</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>2 slices sourdough</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>Fresh chives, snipped</li></ul></div>
+          <div><div class="section-label" style="color:#EA580C">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">1</span>Heat 1 tbsp oil. Fry mushrooms and garlic 4&ndash;5 mins.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">2</span>Add spinach and cook until wilted. Season. Remove from pan.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">3</span>Beat 2 eggs per person with salt &amp; pepper.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">4</span>Heat remaining oil. Pour in eggs, tilting pan to spread.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">5</span>When almost set, add the generous mushroom and spinach filling to one half.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">6</span>Fold over &mdash; the filling keeps it moist without needing cheese.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">7</span>Serve with toasted sourdough and chives.</li></ol></div>
+        </div>
+        <div class="tip">💡 Mushrooms contain beta-glucans which support immune function. Doubling the mushrooms and spinach shifts the macro balance and adds more plant points.</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#F0FDF4">☀️</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#F0FDF4;color:#16A34A">Lunch</span><span class="badge badge-grey">2 people</span><span class="badge badge-green">🌿 12 plants</span><span class="badge badge-grey">⏱ 30 mins</span></div>
+          <div class="meal-title">Middle Eastern Mezze Platter</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#16A34A">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>150g hummus</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>150g baba ganoush</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 &times; 400g tin chickpeas (to roast)</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 tsp olive oil + smoked paprika for chickpeas</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>2 slices sourdough, thickly cut</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 red pepper, sliced</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>&frac12; cucumber, sliced</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>6 radishes, halved</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>80g cherry tomatoes, 40g olives</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>2 tbsp pomegranate seeds</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Fresh mint, extra virgin olive oil to drizzle</li></ul></div>
+          <div><div class="section-label" style="color:#16A34A">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">1</span>Preheat oven to 200&deg;C. Toss chickpeas with olive oil and paprika.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">2</span>Spread on baking tray. Roast 20&ndash;25 mins until crisp.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">3</span>Toast sourdough and cut into thick fingers for dipping.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">4</span>Arrange hummus, baba ganoush and all veg on a large board.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">5</span>Scatter roasted chickpeas, pomegranate seeds, mint.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">6</span>Drizzle everything with extra virgin olive oil.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">7</span>Serve as a sharing platter &mdash; everyone digs in.</li></ol></div>
+        </div>
+        <div class="tip">💡 This platter alone hits 12 plant points. Baba ganoush is made from roasted aubergine &mdash; a prebiotic-rich food.</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#EFF6FF">🌙</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#EFF6FF;color:#2563EB">Dinner</span><span class="badge badge-grey">2 people</span><span class="badge badge-green">🌿 9 plants</span><span class="badge badge-grey">⏱ 40 mins</span></div>
+          <div class="meal-title">Black Bean &amp; Sweet Potato Bake with Sourdough</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#2563EB">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 &times; 400g tin black beans, drained</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>2 medium sweet potatoes, diced (1cm)</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 red onion, diced</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 red pepper, diced</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>2 garlic cloves, crushed</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 tsp cumin, 1 tsp smoked paprika, &frac12; tsp oregano</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>150ml passata + 1 tbsp chipotle paste</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>60g cheddar, grated</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>Natural live yoghurt + lime + parsley to serve</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>4 thick slices sourdough, to serve</li></ul></div>
+          <div><div class="section-label" style="color:#2563EB">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">1</span>Preheat oven to 190&deg;C.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">2</span>Roast sweet potato with 1 tbsp oil, cumin and paprika for 20 mins.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">3</span>Fry onion, pepper and garlic in remaining oil 5 mins.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">4</span>Add beans, roasted sweet potato and oregano. Mix well.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">5</span>Mix passata with chipotle paste. Pour into an oven dish.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">6</span>Spoon bean mixture over the sauce. Sprinkle cheese on top.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">7</span>Bake 15&ndash;20 mins until bubbling and golden.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">8</span>Serve with yoghurt, lime, parsley and toasted sourdough.</li></ol></div>
+        </div>
+        <div class="tip">💡 Deconstructed enchilada &mdash; same flavours, scooped onto sourdough instead. Completely UPF-free.</div>
+      </div>
+    </div></div><div id="day-6" class="day-panel">
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#FFF7ED">🌅</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#FFF7ED;color:#EA580C">Breakfast</span><span class="badge badge-grey">2 people</span><span class="badge badge-green">🌿 5 plants</span><span class="badge badge-grey">⏱ 25 mins</span></div>
+          <div class="meal-title">Buckwheat Pancakes with Berries &amp; Maple Syrup</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#EA580C">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#FB923C"></span>150g buckwheat flour</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>2 eggs</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>250ml oat milk</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tsp baking powder, pinch of salt</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tsp vanilla extract</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>200g mixed berries</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>2 tbsp pure maple syrup</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>Natural live yoghurt to serve</li><li class="ing-item"><span class="dot" style="background:#FB923C"></span>1 tbsp coconut oil for frying</li></ul></div>
+          <div><div class="section-label" style="color:#EA580C">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">1</span>Whisk eggs, oat milk and vanilla together.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">2</span>Add buckwheat flour, baking powder and salt. Whisk to a smooth batter.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">3</span>Rest 5 mins.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">4</span>Heat coconut oil in a non-stick pan over medium heat.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">5</span>Pour small ladles of batter. Cook 2&ndash;3 mins per side.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">6</span>Keep warm in oven at 80&deg;C while cooking remaining pancakes.</li><li class="step-item"><span class="step-num" style="background:#FFF7ED;color:#EA580C">7</span>Serve stacked with berries, yoghurt and maple syrup.</li></ol></div>
+        </div>
+        <div class="tip">💡 Buckwheat is gluten-free, rich in fibre and polyphenols, with a lower GI than standard flour. A proper weekend treat.</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#F0FDF4">☀️</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#F0FDF4;color:#16A34A">Lunch</span><span class="badge badge-grey">2 people</span><span class="badge badge-green">🌿 7 plants</span><span class="badge badge-grey">⏱ 35 mins</span></div>
+          <div class="meal-title">Roasted Tomato &amp; White Bean Soup</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#16A34A">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>400g vine tomatoes, halved</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 &times; 400g tin cannellini beans, drained</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 red onion, quartered</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>4 garlic cloves (unpeeled)</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>3 tbsp olive oil</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>500ml vegetable stock</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>1 tsp dried thyme, 1 tsp balsamic vinegar</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Handful of fresh basil</li><li class="ing-item"><span class="dot" style="background:#4ADE80"></span>Sourdough to serve</li></ul></div>
+          <div><div class="section-label" style="color:#16A34A">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">1</span>Preheat oven to 200&deg;C.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">2</span>Place tomatoes and onion cut-side up on a tray. Tuck in garlic.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">3</span>Drizzle with 2 tbsp olive oil, thyme, salt &amp; pepper. Roast 25 mins.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">4</span>Squeeze garlic from skins. Transfer veg to a blender with stock.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">5</span>Blend until smooth. Pour into a pan with beans.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">6</span>Simmer 5 mins. Add balsamic and season.</li><li class="step-item"><span class="step-num" style="background:#F0FDF4;color:#16A34A">7</span>Serve with fresh basil, drizzle of olive oil and sourdough.</li></ol></div>
+        </div>
+        <div class="tip">💡 Roasting concentrates the tomatoes&rsquo; lycopene and polyphenol content. Add a swirl of live yoghurt for a probiotic boost.</div>
+      </div>
+    </div>
+    <div class="meal-card" onclick="toggleMeal(this)">
+      <div class="meal-header">
+        <div class="emoji-box" style="background:#EFF6FF">🌙</div>
+        <div class="meal-meta">
+          <div class="badges"><span class="badge" style="background:#EFF6FF;color:#2563EB">Dinner</span><span class="badge badge-grey">2 people</span><span class="badge badge-green">🌿 8 plants</span><span class="badge badge-grey">⏱ 45 mins</span></div>
+          <div class="meal-title">Roast Chicken Breast with Brown Rice &amp; Roasted Roots</div>
+        </div>
+        <button class="toggle-btn">+</button>
+      </div>
+      <div class="meal-body">
+        <div class="recipe-grid">
+          <div><div class="section-label" style="color:#2563EB">Ingredients</div><ul class="ing-list"><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>2 chicken breasts</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>160g brown rice (dry weight)</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>2 medium carrots, halved lengthways</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>2 medium parsnips, halved lengthways</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 small beetroot, quartered</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 red onion, cut into wedges</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>3 tbsp olive oil</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>1 tsp rosemary, 1 tsp thyme</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>3 garlic cloves, juice of 1 lemon</li><li class="ing-item"><span class="dot" style="background:#60A5FA"></span>Steamed savoy cabbage to serve</li></ul></div>
+          <div><div class="section-label" style="color:#2563EB">Method</div><ol class="step-list"><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">1</span>Preheat oven to 190&deg;C.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">2</span>Toss all root veg with 2 tbsp olive oil, rosemary, thyme, salt and pepper.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">3</span>Rub chicken with garlic, lemon juice, 1 tbsp olive oil, salt &amp; pepper.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">4</span>Place veg in a large roasting tin. Nestle chicken on top.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">5</span>Roast 25&ndash;30 mins until chicken reaches 75&deg;C internal. Rest 5 mins.</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">6</span>Cook brown rice per packet (25&ndash;30 mins &mdash; start first).</li><li class="step-item"><span class="step-num" style="background:#EFF6FF;color:#2563EB">7</span>Steam savoy cabbage for final 5 mins. Serve everything together.</li></ol></div>
+        </div>
+        <div class="tip">💡 Brown rice is a great source of fibre and B vitamins. Start it before the oven goes on as it takes 25&ndash;30 mins.</div>
+      </div>
+    </div></div></div>
+  <div id="tab-guidelines" class="tab-panel">
+    <div class="panel-card">
+      <div class="panel-eyebrow" style="color:#2563eb">WHO Daily Macro Guidelines</div>
+      <div class="who-grid">
+        <div class="who-card"><div class="who-label">Protein</div><div class="who-value">10&ndash;35% of daily calories</div><div class="who-detail">Min. 0.8g per kg body weight</div></div>
+        <div class="who-card"><div class="who-label">Carbohydrates</div><div class="who-value">45&ndash;65% of daily calories</div><div class="who-detail">Whole grains, legumes, vegetables, fruit</div></div>
+        <div class="who-card"><div class="who-label">Fats</div><div class="who-value">20&ndash;35% of daily calories</div><div class="who-detail">Focus on unsaturated fats &mdash; olive oil, nuts, avocado</div></div>
+        <div class="who-card"><div class="who-label">Fibre</div><div class="who-value">Min. 25g per day</div><div class="who-detail">Plus 400g+ fruit &amp; vegetables daily</div></div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-eyebrow" style="color:#16a34a">Tim Spector / ZOE Gut Health Principles</div>
+      <div class="spector-item"><span class="spector-star">&#10022;</span>30 plant points target &mdash; every unique plant (veg, fruit, grain, legume, nut, seed, herb, spice) = 1 point</div>
+      <div class="spector-item"><span class="spector-star">&#10022;</span>Fermented foods daily &mdash; yoghurt, miso, kimchi, sourdough support microbiome diversity</div>
+      <div class="spector-item"><span class="spector-star">&#10022;</span>Zero ultra-processed foods &mdash; all ingredients whole or minimally processed</div>
+      <div class="spector-item"><span class="spector-star">&#10022;</span>Polyphenol-rich foods &mdash; extra virgin olive oil, berries, dark leafy greens, spices</div>
+      <div class="spector-item"><span class="spector-star">&#10022;</span>Prebiotic fibre &mdash; lentils, beans, oats, garlic, onions feed beneficial gut bacteria</div>
+    </div>
+    <div class="stats-dark">
+      <div class="panel-eyebrow" style="color:#86bc4a">This Week&rsquo;s Plan Delivers</div>
+      <div class="stats-grid">
+        <div class="stat-item"><div class="stat-big">76</div><div class="stat-name">Plant Points</div><div class="stat-desc">Target: 30+</div></div>
+        <div class="stat-item"><div class="stat-big">Daily</div><div class="stat-name">Fermented Foods</div><div class="stat-desc">Yoghurt, miso, kimchi, sourdough</div></div>
+        <div class="stat-item"><div class="stat-big">0</div><div class="stat-name">Ultra-Processed</div><div class="stat-desc">Foods in the plan</div></div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-eyebrow" style="color:#EA580C">Mon&ndash;Fri Overnight Oats &mdash; Prep Guide</div>
+      <p style="font-size:.84rem;color:#3a3020;line-height:1.6;margin-bottom:.8rem">Each weekday breakfast is a different overnight oats variation. All take under 3 minutes to prep the night before.</p>
+      <div class="oats-row"><span class="oats-day">Monday</span><span class="oats-title">Classic Berry &amp; Chia</span><span class="oats-note">Berries + chia + honey</span></div>
+      <div class="oats-row"><span class="oats-day">Tuesday</span><span class="oats-title">Banana &amp; Walnut</span><span class="oats-note">Mashed banana + walnuts + flaxseed</span></div>
+      <div class="oats-row"><span class="oats-day">Wednesday</span><span class="oats-title">Peanut Butter &amp; Apple</span><span class="oats-note">Natural PB + grated apple + honey</span></div>
+      <div class="oats-row"><span class="oats-day">Thursday</span><span class="oats-title">Mango &amp; Coconut</span><span class="oats-note">Coconut milk + mango + cardamom</span></div>
+      <div class="oats-row" style="border-bottom:none"><span class="oats-day">Friday</span><span class="oats-title">Chocolate &amp; Hazelnut</span><span class="oats-note">Raw cacao + hazelnuts + raspberries</span></div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-eyebrow" style="color:#7c3aed">Your Calorie Target</div>
+      <div class="who-grid">
+        <div class="kcal-card"><div class="kcal-label">Maintenance (TDEE)</div><div class="kcal-value">~1,979 kcal/day</div><div class="kcal-detail">Female, 55, 170cm, 65kg, moderately active</div></div>
+        <div class="kcal-card"><div class="kcal-label">This Plan Average</div><div class="kcal-value">~1,662 kcal/day</div><div class="kcal-detail">~317 kcal daily deficit</div></div>
+        <div class="kcal-card"><div class="kcal-label">Projected Loss</div><div class="kcal-value">~0.3kg/week</div><div class="kcal-detail">~1.2kg per month &mdash; sustainable</div></div>
+      </div>
+    </div>
+  </div>
+  <div id="tab-shopping" class="tab-panel">
+    <div class="shop-controls">
+      <div>
+        <div class="shop-title" id="shop-progress-title">0 of 102 items checked</div>
+        <div class="shop-subtitle">Tap items to check off as you shop</div>
+      </div>
+      <div class="shop-right">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <button class="reset-btn" onclick="resetShopping()">Reset</button>
+      </div>
+    </div>
+    <div id="shopping-list"></div>
+  </div>
+</div>
+<script>
+const shopData = {'🥩 Meat &amp; Eggs': ['Chicken breasts &mdash; 5 (Mon dinner &times;2, Wed dinner &times;1, Sun dinner &times;2)', 'Beef braising steak &mdash; 300g (Fri dinner)', 'Lamb mince &mdash; 150g (Tue dinner)', 'Eggs &mdash; 12 large'], '🥛 Dairy &amp; Alternatives': ['Oat milk &mdash; 1.5 litres', 'Coconut milk (tinned, full fat) &mdash; 1 small tin', 'Natural live Greek yoghurt &mdash; 500g', 'Natural live yoghurt (plain) &mdash; 200g', 'Mature cheddar &mdash; 60g (Sat dinner only)', 'Feta cheese &mdash; 30g'], '🌾 Grains, Bread &amp; Pulses': ['Rolled oats &mdash; 300g (overnight oats all week)', 'Sourdough bread &mdash; 2 loaves', 'Soba (buckwheat) noodles &mdash; 80g', 'Bulgur wheat &mdash; 80g', 'Brown rice &mdash; 400g', 'Buckwheat flour &mdash; 150g', 'Baking powder &mdash; small tin'], '🥫 Tinned &amp; Jarred': ['Chopped tomatoes &mdash; 2 &times; 400g tins', 'Chickpeas &mdash; 2 &times; 400g tins', 'Butter beans &mdash; 2 &times; 400g tins', 'Cannellini beans &mdash; 2 &times; 400g tins', 'Black beans &mdash; 1 &times; 400g tin', 'Lentils (green or puy, dry) &mdash; 200g', 'Roasted red peppers (in oil) &mdash; 1 jar', 'Sun-dried tomatoes &mdash; 1 small jar', 'Passata &mdash; 150ml', 'Tomato pur&eacute;e &mdash; 1 small tin', 'Hummus &mdash; 300g', 'Baba ganoush &mdash; 150g', 'White miso paste &mdash; 1 small tub', 'Harissa paste &mdash; 1 jar (check: no UPF)', 'Chipotle paste &mdash; 1 small jar', 'Olives &mdash; 40g', 'Tahini &mdash; 1 jar'], '🥦 Fresh Vegetables': ['Red peppers &mdash; 6', 'Red onions &mdash; 6', 'Brown/white onion &mdash; 1 large', 'Cherry tomatoes &mdash; 200g', 'Vine tomatoes &mdash; 400g', 'Carrots &mdash; 4 medium', 'Parsnips &mdash; 4 medium', 'Beetroot &mdash; 1 small', 'Celery &mdash; 2 stalks', 'Green beans &mdash; 100g', 'Tenderstem broccoli &mdash; 150g', 'Baby spinach &mdash; 150g', 'Savoy cabbage &mdash; 1 small head', 'Rocket &mdash; 3 handfuls', 'Spring onions &mdash; 6', 'Radishes &mdash; 6', 'Cucumber &mdash; 1.5', 'Avocado &mdash; 2 ripe', 'Sweet potatoes &mdash; 2 medium', 'Chestnut mushrooms &mdash; 150g'], '🍋 Fresh Fruit &amp; Herbs': ['Bananas &mdash; 2', 'Apple &mdash; 1', 'Lemons &mdash; 4', 'Limes &mdash; 2', 'Mango &mdash; 1 (or 150g frozen)', 'Mixed berries &mdash; 400g (fresh or frozen)', 'Raspberries &mdash; 1 small punnet', 'Pomegranate seeds &mdash; 1 small pack', 'Flat-leaf parsley &mdash; 2 bunches', 'Fresh mint &mdash; 1 bunch', 'Fresh basil &mdash; 1 bunch', 'Fresh chives &mdash; small bunch', 'Garlic &mdash; 1 bulb (min. 16 cloves)', 'Fresh ginger &mdash; 1 small piece'], '🌻 Nuts, Seeds &amp; Oils': ['Chia seeds &mdash; 1 small bag', 'Mixed seeds (pumpkin, sunflower) &mdash; 100g', 'Ground flaxseed &mdash; small pack', 'Walnuts &mdash; 20g', 'Hazelnuts &mdash; 20g', 'Pine nuts &mdash; 10g', 'Desiccated coconut (unsweetened) &mdash; small pack', 'Natural peanut butter (peanuts only) &mdash; 1 jar', 'Extra virgin olive oil &mdash; 1 bottle', 'Sesame oil &mdash; small bottle', 'Coconut oil &mdash; small jar'], '🧂 Condiments, Spices &amp; Pantry': ['Low-sodium soy sauce &mdash; small bottle', 'Mirin &mdash; small bottle', 'Red wine vinegar &mdash; small bottle', 'Balsamic vinegar &mdash; small bottle', 'Dijon mustard &mdash; small jar', 'Pure maple syrup &mdash; small bottle', 'Raw honey &mdash; 1 jar', 'Raw cacao powder &mdash; small pack', 'Vanilla extract &mdash; small bottle', 'Cornflour &mdash; small pack', 'Smoked paprika &mdash; 1 jar', 'Cumin (ground) &mdash; 1 jar', 'Turmeric &mdash; 1 jar', 'Cinnamon &mdash; 1 jar', 'Chilli flakes &mdash; 1 jar', 'Coriander powder &mdash; 1 jar', 'Oregano (dried) &mdash; 1 jar', 'Thyme (dried) &mdash; 1 jar', 'Rosemary (dried) &mdash; 1 jar', 'Cardamom (ground) &mdash; 1 jar', 'Bay leaves &mdash; 2'], '🫙 Fermented &amp; Chilled': ['Kimchi (live, unpasteurised) &mdash; 1 small jar &mdash; chilled section only', 'Frozen edamame &mdash; 160g (Tue lunch + Wed dinner)']};
+const totalItems = 102;
+const checked = {};
 
+function buildShoppingList() {
+  const container = document.getElementById('shopping-list');
+  container.innerHTML = '';
+  Object.entries(shopData).forEach(([group, items]) => {
+    const checkedCount = items.filter((_,i) => checked[group+'-'+i]).length;
+    const allDone = checkedCount === items.length;
+    const groupEl = document.createElement('div');
+    groupEl.className = 'shop-group' + (allDone ? ' done' : '');
+    const icon = group.split(' ')[0];
+    const name = group.substring(group.indexOf(' ')+1);
+    groupEl.innerHTML = `<div class="group-header"><span style="font-size:1rem">${icon}</span><span class="group-name">${name}</span><span class="group-count">${allDone ? '&#10003; Done' : checkedCount+'/'+items.length}</span></div>`;
+    items.forEach((item, idx) => {
+      const isChecked = !!checked[group+'-'+idx];
+      const btn = document.createElement('button');
+      btn.className = 'shop-item' + (isChecked ? ' checked' : '');
+      btn.innerHTML = `<div class="checkbox">${isChecked ? '&#10003;' : ''}</div><span class="item-text">${item}</span>`;
+      btn.onclick = () => { checked[group+'-'+idx] = !checked[group+'-'+idx]; buildShoppingList(); };
+      groupEl.appendChild(btn);
+    });
+    container.appendChild(groupEl);
+  });
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = Object.values(checked).filter(Boolean).length;
+  document.getElementById('progress-fill').style.width = (done/totalItems*100)+'%';
+  document.getElementById('shop-progress-title').textContent = done + ' of ' + totalItems + ' items checked';
+  document.getElementById('shop-tab-btn').textContent = '🛒 Shopping' + (done > 0 ? ' ('+done+'/'+totalItems+')' : '');
+}
+
+function resetShopping() { Object.keys(checked).forEach(k => delete checked[k]); buildShoppingList(); }
+buildShoppingList();
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+function switchDay(idx, btn) {
+  document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('day-'+idx).classList.add('active');
+  btn.classList.add('active');
+  document.querySelectorAll('#day-'+idx+' .meal-card').forEach(c => { c.classList.remove('open'); c.querySelector('.toggle-btn').textContent = '+'; });
+}
+
+function toggleMeal(card) {
+  const isOpen = card.classList.contains('open');
+  card.classList.toggle('open');
+  card.querySelector('.toggle-btn').textContent = isOpen ? '+' : '&#8722;';
+}
+</script>
+</body>
+</html>
