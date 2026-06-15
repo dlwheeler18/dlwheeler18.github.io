@@ -1,1 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 5 Meal Plan</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#f5f0e8;padding-bottom:60px}
+.hero{background:#1c2b1e;color:#f5f0e8;padding:44px 20px 36px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 0%,#3a5c3e 0%,transparent 60%),radial-gradient(ellipse at 20% 100%,#2d4a31 0%,transparent 50%)}
+.hero-inner{position:relative;z-index:1}
+.hero-eye{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#a8c5a0;margin-bottom:10px}
+.hero-title{font-family:'Playfair Display',serif;font-size:42px;font-weight:700;color:#f5f0e8}
+.hero-title em{font-style:italic;color:#c8dfc4}
+.hero-sub{font-size:13px;color:#8aab85;margin-top:8px}
+.hero-stats{display:flex;justify-content:center;gap:28px;margin-top:24px;flex-wrap:wrap}
+.stat-num{font-family:'Playfair Display',serif;font-size:24px;color:#c8dfc4;font-weight:700}
+.stat-label{font-size:10px;color:#6a8a66;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
 
+.banner{background:#2d1a00;border-left:4px solid #e8932a;margin:16px;border-radius:8px;padding:14px 16px;display:flex;gap:12px}
+.banner-icon{font-size:20px;flex-shrink:0}
+.banner-title{font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#e8932a;margin-bottom:4px}
+.banner-text{font-size:13px;color:#d4a070;line-height:1.5}
+.banner-text strong{color:#f0b870}
+
+.tabs{display:flex;gap:8px;padding:16px 16px 0;overflow-x:auto}
+.tab{padding:8px 18px;border-radius:20px;border:none;cursor:pointer;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.tab.active{background:#1c2b1e;color:#c8dfc4}
+.tab:not(.active){background:#e8e0d8;color:#4a5a48}
+
+.section{display:none;padding:16px 16px 0}
+.section.active{display:block}
+
+.day-card{background:#fff;border-radius:14px;margin-bottom:12px;box-shadow:0 2px 10px rgba(28,43,30,.07);overflow:hidden}
+.day-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer}
+.day-left{display:flex;align-items:center;gap:12px}
+.day-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:13px;flex-shrink:0}
+.day-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#1c2b1e}
+.day-date{font-size:11px;color:#9aab97;margin-top:1px}
+.day-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.day-kcal{font-size:11px;color:#6a8a66;background:#f0f5ef;padding:3px 9px;border-radius:20px;font-weight:500}
+.day-serves{font-size:11px;color:#7a5a20;background:#fdf5e0;padding:3px 9px;border-radius:20px;font-weight:500}
+.day-chevron{font-size:18px;color:#b0c4ac;transition:transform .3s;display:inline-block}
+.day-chevron.open{transform:rotate(180deg)}
+
+.defrost-note{background:#fff8ee;border:1px solid #f5d498;border-radius:8px;margin:0 16px 10px;padding:9px 13px;font-size:12px;color:#8a6020;line-height:1.5}
+.defrost-note strong{color:#c07820}
+
+.day-body{display:none;padding:0 14px 14px}
+.day-body.open{display:block}
+
+.meals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+@media(max-width:560px){.meals{grid-template-columns:1fr}}
+
+.meal-card{border-radius:10px;overflow:hidden;border:1px solid #eee}
+.meal-head{padding:7px 10px;font-size:9px;font-weight:500;letter-spacing:2px;text-transform:uppercase}
+.meal-body{padding:9px 10px 10px;background:#fafaf8}
+.meal-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#1c2b1e;line-height:1.3;margin-bottom:3px}
+.meal-desc{font-size:11px;color:#7a8c78;line-height:1.4}
+.tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:7px}
+.tag{font-size:9px;padding:2px 6px;border-radius:20px;font-weight:500}
+.tag-freezer{background:#e8f4fd;color:#2a7ab8}
+.tag-leftover{background:#fdf0e8;color:#b86020}
+.tag-gut{background:#f0fde8;color:#4a8a20}
+.tag-quick{background:#fde8f0;color:#b82060}
+.tag-batch{background:#ede8fd;color:#6020b8}
+.tag-weekend{background:#1c2b1e;color:#c8dfc4}
+.tag-veg{background:#e8fdf0;color:#207a40}
+.recipe-btn{margin-top:7px;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:#5a9e6f;background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;font-family:'DM Sans',sans-serif}
+
+.meal-card.b{border-top:3px solid #f4a435}
+.b-head{background:#fffbf0;color:#b87820}
+.meal-card.l{border-top:3px solid #5a9e6f}
+.l-head{background:#f0faf3;color:#2a6a45}
+.meal-card.d{border-top:3px solid #1c2b1e}
+.d-head{background:#f0f4f0;color:#1c2b1e}
+
+.macros{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 0}
+.mpill{font-size:11px;padding:3px 9px;border-radius:20px;background:#f5f0e8;color:#4a5a48;font-weight:500}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,43,30,.6);z-index:100;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:680px;max-height:85vh;overflow-y:auto;padding:26px 22px 40px;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-close{float:right;background:#f0f4f0;border:none;cursor:pointer;width:30px;height:30px;border-radius:50%;font-size:16px;color:#4a5a48}
+.modal-eye{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#9aab97;margin-bottom:5px}
+.modal-title{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:#1c2b1e;margin-bottom:4px;line-height:1.2}
+.modal-desc{font-size:13px;color:#6a8a66;margin-bottom:10px;line-height:1.5}
+.modal-serves{display:inline-block;background:#fdf5e0;color:#8a6a20;font-size:12px;font-weight:500;padding:4px 11px;border-radius:20px;margin-bottom:14px}
+.modal-kcal{display:inline-block;background:#f0f4f0;color:#2a3a28;font-size:12px;font-weight:500;padding:4px 11px;border-radius:20px;margin-bottom:14px;margin-left:6px}
+.modal-sec{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#5a9e6f;margin:18px 0 8px;border-bottom:1px solid #e8f0e5;padding-bottom:5px}
+.ing-list{list-style:none}
+.ing-item{display:flex;justify-content:space-between;font-size:13px;color:#2a3a28;padding:6px 0;border-bottom:1px solid #f5f0e8}
+.ing-item:last-child{border-bottom:none}
+.ing-qty{color:#6a8a66;font-size:12px;font-weight:500}
+.steps-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.step{display:flex;gap:10px}
+.step-num{width:22px;height:22px;border-radius:50%;background:#1c2b1e;color:#c8dfc4;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-text{font-size:13px;color:#2a3a28;line-height:1.6}
+.note-box{background:#f5f8f0;border-left:3px solid #5a9e6f;border-radius:0 8px 8px 0;padding:9px 13px;margin-top:14px;font-size:12px;color:#4a6a48;line-height:1.5}
+
+.progress-wrap{padding:14px 16px 0}
+.progress-label{font-size:12px;color:#6a8a66;margin-bottom:5px;display:flex;justify-content:space-between}
+.progress-bg{background:#e8ede5;border-radius:20px;height:9px;overflow:hidden}
+.progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#5a9e6f,#3a7a50);transition:width .3s}
+.shop-grid{padding:12px 16px 0}
+.shop-cat{background:#fff;border-radius:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(28,43,30,.06);overflow:hidden}
+.shop-cat-head{padding:11px 14px;display:flex;align-items:center;gap:9px;cursor:pointer}
+.shop-cat-icon{font-size:17px}
+.shop-cat-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#1c2b1e}
+.shop-cat-count{font-size:11px;color:#9aab97;margin-left:auto}
+.shop-cat-chev{color:#b0c4ac;margin-left:8px}
+.shop-items{padding:0 14px 12px}
+.shop-item{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid #f5f0e8;cursor:pointer}
+.shop-item:last-child{border-bottom:none}
+.shop-check{width:19px;height:19px;border-radius:50%;border:2px solid #c8dfc4;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.shop-check.checked{background:#1c2b1e;border-color:#1c2b1e}
+.shop-check-tick{color:#c8dfc4;font-size:10px;display:none}
+.shop-check.checked .shop-check-tick{display:block}
+.shop-item-name{font-size:13px;color:#2a3a28;flex:1}
+.shop-item-name.checked{text-decoration:line-through;color:#aaa}
+.shop-item-freezer{font-size:10px;color:#2a7ab8;background:#e8f4fd;padding:2px 6px;border-radius:10px;flex-shrink:0}
+.shop-item-qty{font-size:12px;color:#7a9a78;font-weight:500;text-align:right;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eye">Clean Eating &middot; Zero UPF &middot; Gut Health</div>
+    <div class="hero-title">Week 5<br>7 Day Healthy Meal Plan</div>
+    <div class="hero-sub">7 days &middot; ~1,662 kcal avg &middot; 50+ plant points &middot; Daily ferments</div>
+    <div class="hero-stats">
+      <div><div class="stat-num">~1,662</div><div class="stat-label">Avg kcal</div></div>
+      <div><div class="stat-num">50+</div><div class="stat-label">Plant pts</div></div>
+      <div><div class="stat-num">7</div><div class="stat-label">Freezer items</div></div>
+      <div><div class="stat-num">0</div><div class="stat-label">UPF</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="banner">
+  <div class="banner-icon">&#x1F9CA;</div>
+  <div>
+    <div class="banner-title">Sunday Evening &mdash; Defrost Before Week Starts</div>
+    <div class="banner-text">Move <strong>minced lamb, cubed aubergine &amp; courgette</strong> from freezer to fridge tonight. They need a full overnight defrost for Monday's stew.</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('plan',this)">&#128197; Meal Plan</button>
+  <button class="tab" onclick="showTab('shopping',this)">&#128722; Shopping List</button>
+</div>
+
+<div id="tab-plan" class="section active"></div>
+<div id="tab-shopping" class="section">
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Shopping progress</span><span id="prog-text">0 / 0</span></div>
+    <div class="progress-bg"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="shop-grid" id="shop-grid"></div>
+</div>
+
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" id="modal-inner"></div>
+</div>
+
+<script>
+const TAG_LABELS = {
+  freezer:"🧊 freezer", leftover:"♻️ leftover", gut:"🌱 gut",
+  quick:"⚡ quick", batch:"📦 batch", weekend:"✨ weekend", veg:"🥦 plant-based"
+};
+
+const DAYS = [
+  {
+    id:"mon", name:"Monday", date:"Week 2 · Day 1",
+    serves:"×2", kcal:"~1,640 per person",
+    dotBg:"#f0faf3", dotColor:"#2a6a45", plants:7,
+    macros:{P:"102g",C:"168g",F:"52g",Fi:"28g"},
+    defrost:"🧊 Tonight: move leek from freezer to fridge for Tuesday's soup.",
+    meals:[
+      {
+        slot:"b", label:"Breakfast", kcal:390, serves:2,
+        name:"Overnight Oats",
+        desc:"Rolled oats, oat milk, chia seeds, banana & mixed berries",
+        tags:["quick","gut"],
+        ings:[
+          ["Rolled oats","120g"],["Homemade oat milk","360ml"],["Chia seeds","2 tbsp"],
+          ["Banana, sliced","1"],["Mixed berries","160g"],["Mixed seeds","2 tbsp"]
+        ],
+        steps:[
+          "Combine oats, oat milk and chia seeds in two jars. Stir well.",
+          "Cover and refrigerate overnight.",
+          "Top with banana, berries and seeds in the morning."
+        ],
+        note:"Make Sunday evening — zero effort Monday morning."
+      },
+      {
+        slot:"l", label:"Lunch", kcal:410, serves:2,
+        name:"Lentil & Celery Salad",
+        desc:"Green lentils, celery, red onion, parsley, lemon & olive oil. Sourdough on the side.",
+        tags:["quick","gut","freezer"],
+        ings:[
+          ["Green or Puy lentils (tinned, drained)","300g"],
+          ["Celery stalks, sliced (from freezer)","3-4 stalks"],
+          ["Red onion, finely diced","½"],["Fresh flat-leaf parsley","large handful"],
+          ["Lemon juice","2 tbsp"],["Extra-virgin olive oil","2 tbsp"],
+          ["Pomegranate molasses","2 tsp"],["Sea salt & black pepper","to taste"],
+          ["Sourdough bread","2 slices"]
+        ],
+        steps:[
+          "Drain and rinse lentils. Allow celery to defrost briefly or slice from frozen.",
+          "Combine lentils, celery, red onion and parsley in a bowl.",
+          "Whisk lemon juice, olive oil and pomegranate molasses. Season well.",
+          "Toss dressing through salad. Serve with toasted sourdough."
+        ],
+        note:"Pomegranate molasses adds real depth here — don't skip it."
+      },
+      {
+        slot:"d", label:"Dinner", kcal:840, serves:2,
+        name:"Spiced Lamb, Aubergine & Courgette Stew",
+        desc:"Middle Eastern minced lamb, cubed aubergine & courgette, cumin, cinnamon & tomatoes. Bulgur wheat.",
+        tags:["freezer","batch","gut"],
+        ings:[
+          ["Minced lamb (from freezer, defrosted)","500g"],
+          ["Cubed aubergine (from freezer, defrosted)","300g"],
+          ["Cubed courgette (from freezer, defrosted)","200g"],
+          ["Tinned chopped tomatoes","1 tin (400g)"],
+          ["Onion, diced","1 medium"],["Garlic cloves, minced","3"],
+          ["Ground cumin","1 tbsp"],["Ground cinnamon","1 tsp"],
+          ["Ground allspice","½ tsp"],["Smoked paprika","1 tsp"],
+          ["Carton beef stock (Salsus)","300ml"],["Olive oil","1 tbsp"],
+          ["Bulgur wheat (dry)","140g"],["Sea salt & black pepper","to taste"],
+          ["Fresh parsley to serve","large handful"]
+        ],
+        steps:[
+          "Heat olive oil in a wide pan over medium-high. Add onion and cook 5 mins until softened.",
+          "Add garlic and all spices. Stir 1 min until fragrant.",
+          "Add minced lamb. Break apart and brown well, about 6-8 mins.",
+          "Add aubergine and courgette. Stir to coat in the spiced lamb.",
+          "Pour in tomatoes and stock. Season well. Bring to a simmer.",
+          "Reduce heat, cover and cook 25 mins until veg is tender and sauce has thickened.",
+          "Cook bulgur: pour boiling water over (1:1.5 ratio), cover and rest 15 mins. Fluff with fork.",
+          "Serve stew over bulgur, topped with fresh parsley. Reserve half for Tuesday lunch."
+        ],
+        note:"Reserve half the stew for Tuesday lunch — it deepens beautifully overnight."
+      }
+    ]
+  },
+  {
+    id:"tue", name:"Tuesday", date:"Week 2 · Day 2",
+    serves:"×1", kcal:"~1,580",
+    dotBg:"#f0faf3", dotColor:"#2a6a45", plants:6,
+    macros:{P:"95g",C:"155g",F:"48g",Fi:"30g"},
+    defrost:null,
+    meals:[
+      {
+        slot:"b", label:"Breakfast", kcal:390, serves:1,
+        name:"Overnight Oats",
+        desc:"Rolled oats, oat milk, chia seeds, grated apple, walnuts & cinnamon",
+        tags:["quick","gut"],
+        ings:[
+          ["Rolled oats","60g"],["Homemade oat milk","180ml"],["Chia seeds","1 tbsp"],
+          ["Apple, grated","½"],["Walnuts, roughly chopped","15g"],
+          ["Ground cinnamon","¼ tsp"],["Honey","1 tsp"]
+        ],
+        steps:[
+          "Combine oats, oat milk, chia seeds and cinnamon. Stir well and refrigerate overnight.",
+          "Grate apple directly on top in the morning. Add walnuts and a drizzle of honey."
+        ],
+        note:""
+      },
+      {
+        slot:"l", label:"Lunch", kcal:420, serves:1,
+        name:"Leftover Lamb Stew",
+        desc:"Monday's spiced lamb, aubergine & courgette stew reheated. Extra bulgur if needed.",
+        tags:["leftover","quick"],
+        ings:[
+          ["Reserved lamb stew (from Monday)","1 portion"],
+          ["Bulgur wheat (dry, optional top-up)","40g"],
+          ["Fresh parsley","small handful"],["Lemon wedge","1"]
+        ],
+        steps:[
+          "Reheat stew in a small pan with a splash of water to loosen.",
+          "Cook fresh bulgur if needed (boiling water 1:1.5, cover, rest 15 mins).",
+          "Serve topped with parsley and a squeeze of lemon."
+        ],
+        note:"The spices deepen overnight — this is often better than Monday's portion."
+      },
+      {
+        slot:"d", label:"Dinner", kcal:770, serves:1,
+        name:"Leek & White Bean Soup",
+        desc:"Silky leek & cannellini bean soup with garlic, thyme & sourdough",
+        tags:["freezer","gut"],
+        ings:[
+          ["Leek, sliced (from freezer, defrosted)","1 large"],
+          ["Cannellini beans (tinned, drained)","1 tin (240g)"],
+          ["Garlic cloves, minced","2"],["Carton vegetable stock","600ml"],
+          ["Fresh thyme","3 sprigs"],["Bay leaf","1"],
+          ["Olive oil","1 tbsp"],["Sea salt & black pepper","to taste"],
+          ["Sourdough bread","1-2 slices"],["Extra-virgin olive oil to drizzle","1 tsp"]
+        ],
+        steps:[
+          "Heat olive oil in a saucepan. Cook leek gently 8 mins until very soft and sweet.",
+          "Add garlic, thyme and bay. Cook 2 mins.",
+          "Add beans and stock. Simmer 15 mins.",
+          "Remove bay and thyme stems. Partially blend with a stick blender — keep some texture.",
+          "Season generously. Serve with sourdough and a drizzle of olive oil."
+        ],
+        note:"Partial blending gives a creamy body without adding cream."
+      }
+    ]
+  },
+  {
+    id:"wed", name:"Wednesday", date:"Week 2 · Day 3",
+    serves:"×1", kcal:"~1,610",
+    dotBg:"#f0faf3", dotColor:"#2a6a45", plants:7,
+    macros:{P:"88g",C:"175g",F:"50g",Fi:"32g"},
+    defrost:null,
+    meals:[
+      {
+        slot:"b", label:"Breakfast", kcal:400, serves:1,
+        name:"Overnight Oats",
+        desc:"Rolled oats, oat milk, chia seeds, pear & almond butter",
+        tags:["quick","gut"],
+        ings:[
+          ["Rolled oats","60g"],["Homemade oat milk","180ml"],["Chia seeds","1 tbsp"],
+          ["Pear, diced","½"],["Almond butter","1 tbsp"],["Mixed seeds","1 tbsp"]
+        ],
+        steps:[
+          "Combine oats, oat milk and chia seeds. Stir and refrigerate overnight.",
+          "Top with diced pear, almond butter and seeds in the morning."
+        ],
+        note:""
+      },
+      {
+        slot:"l", label:"Lunch", kcal:390, serves:1,
+        name:"Tomato & Lentil Soup",
+        desc:"Hearty tomato base with red lentils, garlic, cumin & smoked paprika. Sourdough on the side.",
+        tags:["gut","veg"],
+        ings:[
+          ["Red lentils (dry)","60g"],["Tinned chopped tomatoes","½ tin (200g)"],
+          ["Vegetable stock","400ml"],["Onion, diced","½"],
+          ["Garlic cloves, minced","2"],["Ground cumin","1 tsp"],
+          ["Smoked paprika","½ tsp"],["Olive oil","1 tbsp"],
+          ["Lemon juice","1 tbsp"],["Sea salt & pepper","to taste"],
+          ["Sourdough bread","1 slice"]
+        ],
+        steps:[
+          "Heat olive oil in a saucepan. Soften onion 5 mins, add garlic and spices, stir 1 min.",
+          "Add lentils, tomatoes and stock. Bring to a boil then simmer 20 mins until lentils break down.",
+          "Add lemon juice and season generously.",
+          "Blend partially or leave chunky. Serve with sourdough."
+        ],
+        note:"Red lentils dissolve into the soup naturally — no pre-soaking needed."
+      },
+      {
+        slot:"d", label:"Dinner", kcal:820, serves:1,
+        name:"Spiced Chickpea Stuffed Bell Peppers",
+        desc:"Sweet bell peppers filled with spiced chickpeas, onion, tomato & bulgur. Yogurt to serve.",
+        tags:["gut","veg"],
+        ings:[
+          ["Large bell peppers (any colour)","2"],
+          ["Chickpeas (tinned, drained)","½ tin (120g)"],
+          ["Tinned chopped tomatoes","3 tbsp"],["Onion, finely diced","¼"],
+          ["Garlic clove, minced","1"],["Bulgur wheat (dry)","50g"],
+          ["Ground cumin","¾ tsp"],["Smoked paprika","½ tsp"],["Ground cinnamon","¼ tsp"],
+          ["Olive oil","1 tbsp"],["Fresh parsley","small handful"],
+          ["Natural yogurt to serve","2 tbsp"],["Lemon juice","1 tbsp"],
+          ["Sea salt & pepper","to taste"]
+        ],
+        steps:[
+          "Preheat oven to 190°C. Cook bulgur: cover with boiling water (1:1.5), rest 15 mins, fluff.",
+          "Heat oil in a pan. Soften onion 4 mins, add garlic and spices, stir 1 min.",
+          "Add chickpeas and tomatoes. Cook 5 mins until thickened. Stir in bulgur and parsley. Season.",
+          "Slice tops off peppers and scoop out seeds. Fill generously with chickpea mixture.",
+          "Place in a baking dish with a little water in the base. Cover loosely with foil.",
+          "Bake 30 mins, then uncover for a final 10 mins until peppers are tender.",
+          "Squeeze lemon over and serve with yogurt."
+        ],
+        note:"The water in the base steams the peppers from below — don't skip this step."
+      }
+    ]
+  },
+  {
+    id:"thu", name:"Thursday", date:"Week 2 · Day 4",
+    serves:"×1", kcal:"~1,650",
+    dotBg:"#f0faf3", dotColor:"#2a6a45", plants:6,
+    macros:{P:"98g",C:"162g",F:"54g",Fi:"29g"},
+    defrost:"🧊 Tonight: move butternut squash & swede from freezer to fridge for Saturday's salad.",
+    meals:[
+      {
+        slot:"b", label:"Breakfast", kcal:390, serves:1,
+        name:"Overnight Oats",
+        desc:"Rolled oats, oat milk, chia seeds, strawberries & pistachios",
+        tags:["quick","gut"],
+        ings:[
+          ["Rolled oats","60g"],["Homemade oat milk","180ml"],["Chia seeds","1 tbsp"],
+          ["Strawberries, hulled & sliced","80g"],["Pistachios, shelled","15g"],["Honey","1 tsp"]
+        ],
+        steps:[
+          "Combine oats, oat milk and chia seeds. Refrigerate overnight.",
+          "Top with strawberries, pistachios and honey in the morning."
+        ],
+        note:""
+      },
+      {
+        slot:"l", label:"Lunch", kcal:430, serves:1,
+        name:"Warm Roasted Pepper & Feta Bowl",
+        desc:"Roasted mixed peppers, red onion with crumbled feta, olives & sourdough",
+        tags:["gut","quick"],
+        ings:[
+          ["Mixed peppers, sliced","2 medium"],["Red onion, cut in wedges","½"],
+          ["Feta cheese, crumbled","50g"],["Kalamata olives","30g"],
+          ["Olive oil","1 tbsp"],["Dried oregano","½ tsp"],
+          ["Lemon juice","1 tbsp"],["Sourdough","1 slice"]
+        ],
+        steps:[
+          "Preheat oven to 200°C. Toss peppers and onion in oil, oregano, salt and pepper.",
+          "Roast 22 mins until softened and charred at edges.",
+          "Transfer to a bowl, top with feta and olives. Squeeze over lemon.",
+          "Serve with sourdough."
+        ],
+        note:""
+      },
+      {
+        slot:"d", label:"Dinner", kcal:830, serves:1,
+        name:"Spiced Chickpea & Spinach Stew",
+        desc:"Chickpeas, tomatoes, spinach, cumin, turmeric & smoked paprika. Yogurt & sourdough.",
+        tags:["gut","batch","veg"],
+        ings:[
+          ["Chickpeas (tinned, drained)","1 tin (240g)"],
+          ["Tinned chopped tomatoes","½ tin (200g)"],["Fresh spinach","100g"],
+          ["Onion, diced","½"],["Garlic, minced","2 cloves"],
+          ["Ground cumin","1 tsp"],["Turmeric","½ tsp"],["Smoked paprika","1 tsp"],
+          ["Chilli flakes","pinch"],["Vegetable stock","200ml"],
+          ["Olive oil","1 tbsp"],["Lemon juice","1 tbsp"],
+          ["Natural yogurt to serve","2 tbsp"],["Sourdough bread","1-2 slices"]
+        ],
+        steps:[
+          "Heat oil. Soften onion 5 mins, add garlic and spices, stir 1 min.",
+          "Add chickpeas, tomatoes and stock. Simmer 15 mins.",
+          "Stir in spinach in batches until wilted. Add lemon juice and season.",
+          "Serve topped with yogurt and sourdough for dipping."
+        ],
+        note:"Make a double batch — Friday lunch is sorted."
+      }
+    ]
+  },
+  {
+    id:"fri", name:"Friday", date:"Week 2 · Day 5",
+    serves:"×1 (B&L) / ×2 (dinner)", kcal:"~1,600 per person",
+    dotBg:"#f0faf3", dotColor:"#2a6a45", plants:6,
+    macros:{P:"96g",C:"158g",F:"52g",Fi:"27g"},
+    defrost:"🧊 Tonight: move butternut squash & swede from freezer to fridge for Saturday's salad.",
+    meals:[
+      {
+        slot:"b", label:"Breakfast", kcal:390, serves:1,
+        name:"Overnight Oats",
+        desc:"Rolled oats, oat milk, chia seeds, mango & coconut flakes",
+        tags:["quick","gut"],
+        ings:[
+          ["Rolled oats","60g"],["Homemade oat milk","180ml"],["Chia seeds","1 tbsp"],
+          ["Fresh or frozen mango, diced","70g"],
+          ["Desiccated coconut (unsweetened)","1 tbsp"],["Mixed seeds","1 tbsp"]
+        ],
+        steps:[
+          "Combine oats, oat milk and chia seeds. Refrigerate overnight.",
+          "Top with mango, coconut and seeds in the morning."
+        ],
+        note:""
+      },
+      {
+        slot:"l", label:"Lunch", kcal:415, serves:1,
+        name:"Leftover Chickpea & Spinach Stew",
+        desc:"Thursday's stew reheated with yogurt & sourdough",
+        tags:["leftover","quick"],
+        ings:[
+          ["Reserved chickpea stew (from Thursday)","1 portion"],
+          ["Natural yogurt","2 tbsp"],["Sourdough bread","1 slice"],["Lemon wedge","1"]
+        ],
+        steps:[
+          "Reheat stew gently with a splash of water.",
+          "Serve with yogurt, sourdough and lemon."
+        ],
+        note:""
+      },
+      {
+        slot:"d", label:"Dinner", kcal:795, serves:2,
+        name:"Harissa Chicken Breast with Roasted Roots",
+        desc:"Chicken breast marinated in harissa, honey-roasted carrots & parsnips, pomegranate salad",
+        tags:["gut"],
+        ings:[
+          ["Chicken breasts","2 × 180g"],
+          ["Rose harissa (clean label — peppers, oil, spices only)","3 tbsp"],
+          ["Lemon juice","2 tbsp"],["Olive oil","1 tbsp"],
+          ["Carrots, cut into batons","300g"],["Parsnips, quartered","2 medium"],
+          ["Honey","2 tsp"],["Mixed salad leaves","100g"],
+          ["Pomegranate molasses","2 tsp"],
+          ["Extra-virgin olive oil (dressing)","2 tbsp"],["Lemon juice (dressing)","1 tbsp"]
+        ],
+        steps:[
+          "Mix harissa, lemon and olive oil. Coat chicken breasts. Marinate at least 30 mins.",
+          "Preheat oven to 200°C. Toss carrots and parsnips in oil and honey. Roast 30 mins.",
+          "Place chicken on a separate tray. Roast 22-25 mins until cooked through (no pink).",
+          "Rest chicken 5 mins before slicing.",
+          "Whisk pomegranate molasses, olive oil and lemon for dressing. Toss with salad.",
+          "Serve sliced chicken alongside roots and dressed salad."
+        ],
+        note:"Belazu rose harissa is a reliable clean-label option — check ingredients before buying."
+      }
+    ]
+  },
+  {
+    id:"sat", name:"Saturday", date:"Week 2 · Day 6",
+    serves:"×2", kcal:"~1,780 per person",
+    dotBg:"#1c2b1e", dotColor:"#c8dfc4", plants:9,
+    macros:{P:"115g",C:"172g",F:"66g",Fi:"33g"},
+    defrost:null,
+    meals:[
+      {
+        slot:"b", label:"Breakfast", kcal:490, serves:2,
+        name:"Shakshuka",
+        desc:"Eggs poached in spiced tomato & pepper sauce, with sourdough to mop up",
+        tags:["weekend","gut"],
+        ings:[
+          ["Eggs","4 large"],["Tinned chopped tomatoes","1 tin (400g)"],
+          ["Red peppers, diced","2"],["Onion, diced","1"],
+          ["Garlic, minced","2 cloves"],["Ground cumin","1 tsp"],
+          ["Smoked paprika","1 tsp"],["Chilli flakes","pinch"],
+          ["Olive oil","1 tbsp"],["Sea salt & pepper","to taste"],
+          ["Fresh parsley or basil","handful"],["Sourdough","2-4 slices"]
+        ],
+        steps:[
+          "Heat oil in a wide frying pan. Soften onion and pepper 8 mins.",
+          "Add garlic and spices. Stir 1 min until fragrant.",
+          "Pour in tomatoes. Season and simmer 10 mins until sauce thickens.",
+          "Make four wells in the sauce. Crack in eggs. Cover and cook 5-7 mins until whites set, yolks runny.",
+          "Scatter with herbs. Serve straight from the pan with sourdough."
+        ],
+        note:"Serve directly from the pan — it keeps warm and looks beautiful."
+      },
+      {
+        slot:"l", label:"Lunch", kcal:490, serves:2,
+        name:"Roasted Butternut Squash & Swede Salad",
+        desc:"Roasted squash & swede with rocket, toasted seeds, feta & pomegranate dressing",
+        tags:["freezer","gut"],
+        ings:[
+          ["Butternut squash, cubed (from freezer, defrosted)","400g"],
+          ["Swede, cubed (from freezer, defrosted)","300g"],
+          ["Rocket","120g"],["Feta, crumbled","80g"],
+          ["Pumpkin seeds, toasted","4 tbsp"],["Red onion, thinly sliced","½"],
+          ["Olive oil (for roasting)","2 tbsp"],["Dried thyme","1 tsp"],
+          ["Pomegranate molasses","2 tsp"],
+          ["Extra-virgin olive oil (dressing)","2 tbsp"],["Lemon juice","2 tbsp"],
+          ["Sea salt & pepper","to taste"]
+        ],
+        steps:[
+          "Preheat oven to 200°C. Toss squash and swede in olive oil, thyme, salt and pepper.",
+          "Roast 30-35 mins until golden and caramelised. Cool slightly.",
+          "Whisk pomegranate molasses, olive oil and lemon juice for dressing.",
+          "Arrange rocket and red onion. Top with roasted veg, feta and seeds.",
+          "Drizzle dressing over and serve."
+        ],
+        note:"Defrost squash and swede overnight Friday. The caramelised swede is surprisingly sweet."
+      },
+      {
+        slot:"d", label:"Dinner", kcal:800, serves:2,
+        name:"Roast Chicken Breast with Preserved Lemon & Olives",
+        desc:"Chicken breasts roasted with preserved lemon, olives, garlic & herbs. New potatoes & green salad.",
+        tags:["weekend","gut","batch"],
+        ings:[
+          ["Chicken breasts","2 × 180g"],
+          ["Preserved lemon (rind only, finely chopped)","1 tbsp"],
+          ["Kalamata olives","60g"],["Garlic cloves, sliced","3"],
+          ["Fresh thyme","4 sprigs"],["Olive oil","2 tbsp"],
+          ["Lemon juice","1 tbsp"],["New potatoes, halved","300g"],
+          ["Cherry tomatoes","150g"],["Mixed salad leaves","80g"],
+          ["Extra-virgin olive oil (for salad)","1 tbsp"],
+          ["Sea salt & pepper","to taste"]
+        ],
+        steps:[
+          "Preheat oven to 200°C. Mix preserved lemon rind, olive oil, lemon juice and thyme.",
+          "Coat chicken breasts in the mixture. Marinate 20 mins if time allows.",
+          "Toss new potatoes in oil and salt. Roast 25 mins.",
+          "Add chicken and cherry tomatoes to a separate tray. Scatter over olives and garlic.",
+          "Roast chicken 22-25 mins until cooked through. Rest 5 mins before serving.",
+          "Dress salad with olive oil and a squeeze of lemon.",
+          "Serve chicken with potatoes, tomatoes and salad. Reserve one chicken breast for Sunday lunch."
+        ],
+        note:"Preserved lemon gives an intense, fragrant hit — a little goes a long way. Reserve one portion for Sunday lunch."
+      }
+    ]
+  },
+  {
+    id:"sun", name:"Sunday", date:"Week 2 · Day 7",
+    serves:"×2", kcal:"~1,790 per person",
+    dotBg:"#1c2b1e", dotColor:"#c8dfc4", plants:8,
+    macros:{P:"118g",C:"165g",F:"60g",Fi:"30g"},
+    defrost:null,
+    meals:[
+      {
+        slot:"b", label:"Breakfast", kcal:490, serves:2,
+        name:"Bircher Muesli",
+        desc:"Oats soaked in apple juice & oat milk, grated apple, toasted nuts & berries",
+        tags:["weekend","gut"],
+        ings:[
+          ["Rolled oats","120g"],["Homemade oat milk","200ml"],
+          ["Pure apple juice (no additives)","160ml"],["Chia seeds","2 tbsp"],
+          ["Apple, coarsely grated","1"],["Mixed berries","160g"],
+          ["Flaked almonds, toasted","30g"],["Walnuts","20g"],
+          ["Natural live yogurt","6 tbsp"]
+        ],
+        steps:[
+          "Combine oats, oat milk, apple juice and chia seeds Saturday evening. Stir and cover.",
+          "In the morning, stir in grated apple.",
+          "Divide between bowls. Top with berries, nuts and a generous spoon of yogurt each."
+        ],
+        note:"Make Saturday evening — a completely effortless Sunday morning."
+      },
+      {
+        slot:"l", label:"Lunch", kcal:430, serves:2,
+        name:"Leftover Chicken with Preserved Lemon & New Potato Salad",
+        desc:"Saturday's roast chicken sliced cold over a warm potato & olive salad with fresh herbs",
+        tags:["leftover","quick"],
+        ings:[
+          ["Reserved roast chicken breasts (from Saturday)","2 portions"],
+          ["Leftover new potatoes (from Saturday), halved","as available"],
+          ["Cherry tomatoes, halved","120g"],["Kalamata olives","30g"],
+          ["Cucumber, diced","½"],["Fresh parsley & basil","large handful"],
+          ["Lemon juice","2 tbsp"],["Extra-virgin olive oil","2 tbsp"]
+        ],
+        steps:[
+          "Slice chicken cold or warm gently in a pan.",
+          "Toss potatoes, tomatoes, olives and cucumber together.",
+          "Dress with lemon juice and olive oil. Scatter with herbs.",
+          "Serve chicken alongside or on top of the salad."
+        ],
+        note:"If potatoes are all used up, serve with sourdough instead."
+      },
+      {
+        slot:"d", label:"Dinner", kcal:870, serves:2,
+        name:"Beef & Lentil Stew",
+        desc:"Slow-cooked braising beef, green lentils, carrots, celery & thyme. Crusty sourdough.",
+        tags:["weekend","gut","batch"],
+        ings:[
+          ["Braising beef (chuck or shin), cubed","440g"],
+          ["Green or Puy lentils (dry)","120g"],
+          ["Carrots, diced","3 medium"],["Celery stalks, diced (fresh or frozen)","3 stalks"],
+          ["Onion, diced","1 large"],["Garlic, minced","4 cloves"],
+          ["Tinned chopped tomatoes","½ tin (200g)"],
+          ["Carton beef stock (Salsus / Fine & Wild)","700ml"],
+          ["Fresh thyme","4 sprigs"],["Bay leaves","2"],
+          ["Olive oil","1 tbsp"],["Sea salt & pepper","to taste"],
+          ["Sourdough bread","2-4 slices"]
+        ],
+        steps:[
+          "Season beef well. Heat oil in a heavy casserole over high heat. Brown beef in batches — don't crowd the pan. Set aside.",
+          "Reduce heat. Cook onion and celery 6 mins until softened. Add garlic, thyme and bay. Cook 1 min.",
+          "Return beef. Add lentils, tomatoes and stock. Stir well. Bring to a boil.",
+          "Reduce to the gentlest simmer. Cover and cook 1 hour 15 mins.",
+          "Add carrots. Cook a further 30 mins until beef is tender and lentils have broken into the broth.",
+          "Remove bay and thyme stems. Season generously. Serve with sourdough."
+        ],
+        note:"Start this by 4pm for a 6pm dinner. Salsus beef stock gives extraordinary depth without any UPF."
+      }
+    ]
+  }
+];
+
+const SHOPPING = [
+  { cat:"Meat & Poultry", icon:"🥩", items:[
+    {n:"Minced lamb (defrost Sunday evening)",q:"500g",f:true},
+    {n:"Chicken breasts",q:"4 × 180g (Fri dinner + Sat dinner)"},
+    {n:"Braising beef, chuck or shin",q:"440g"},
+  ]},
+  { cat:"Freezer Use-Up", icon:"🧊", items:[
+    {n:"Minced lamb",q:"500g — defrost Sunday evening",f:true},
+    {n:"Cubed aubergine",q:"300g — defrost Sunday evening",f:true},
+    {n:"Cubed courgette",q:"200g — defrost Sunday evening",f:true},
+    {n:"Leek",q:"1 large — defrost Monday evening",f:true},
+    {n:"Butternut squash",q:"400g — defrost Friday evening",f:true},
+    {n:"Swede",q:"300g — defrost Friday evening",f:true},
+    {n:"Celery",q:"3-4 stalks — use Mon lunch + Sun dinner",f:true},
+  ]},
+  { cat:"Vegetables & Fruit", icon:"🥦", items:[
+    {n:"Onions",q:"4 medium"},{n:"Red onions",q:"2"},{n:"Garlic",q:"2 bulbs"},
+    {n:"Cherry tomatoes",q:"270g"},{n:"Mixed peppers",q:"5 large"},
+    {n:"Carrots",q:"6 medium"},{n:"Parsnips",q:"2 medium"},
+    {n:"New potatoes",q:"300g"},{n:"Fresh spinach",q:"100g"},
+    {n:"Rocket",q:"120g"},{n:"Mixed salad leaves",q:"180g"},
+    {n:"Cucumber",q:"1"},{n:"Banana",q:"1"},{n:"Apples",q:"2"},
+    {n:"Pear",q:"1"},{n:"Strawberries",q:"80g"},
+    {n:"Mixed berries",q:"480g"},{n:"Lemons",q:"6"},
+    {n:"Fresh or frozen mango",q:"70g"},
+  ]},
+  { cat:"Dairy & Eggs", icon:"🥚", items:[
+    {n:"Eggs",q:"4 large (Sat shakshuka)"},
+    {n:"Feta cheese",q:"130g"},{n:"Natural live yogurt",q:"400g"},
+  ]},
+  { cat:"Tins & Pulses", icon:"🥫", items:[
+    {n:"Tinned chopped tomatoes",q:"3 tins"},
+    {n:"Cannellini beans",q:"1 tin"},{n:"Chickpeas",q:"2 tins"},
+    {n:"Green / Puy lentils (tinned or dry)",q:"300g"},
+    {n:"Red lentils (dry)",q:"60g"},
+    {n:"Puy lentils (dry — Sunday stew)",q:"120g"},
+  ]},
+  { cat:"Grains & Bread", icon:"🍞", items:[
+    {n:"Rolled oats",q:"600g"},{n:"Bulgur wheat",q:"240g"},
+    {n:"Sourdough bread",q:"1-2 loaves"},
+    {n:"Pure apple juice (no additives)",q:"small carton"},
+  ]},
+  { cat:"Pantry & Condiments", icon:"🫙", items:[
+    {n:"Extra-virgin olive oil",q:"large bottle"},
+    {n:"Kalamata olives",q:"90g"},{n:"Capers",q:"small jar"},
+    {n:"Preserved lemons",q:"small jar"},
+    {n:"Rose harissa (clean label)",q:"small jar"},
+    {n:"Dijon mustard",q:"small jar"},
+    {n:"Pomegranate molasses",q:"small bottle"},
+    {n:"Almond butter",q:"small jar"},{n:"Honey (raw)",q:"small jar"},
+    {n:"Desiccated coconut (unsweetened)",q:"small bag"},
+  ]},
+  { cat:"Nuts & Seeds", icon:"🌰", items:[
+    {n:"Chia seeds",q:"100g"},{n:"Mixed seeds (pumpkin, sunflower)",q:"100g"},
+    {n:"Pumpkin seeds",q:"60g"},{n:"Walnuts",q:"50g"},
+    {n:"Pistachios (shelled)",q:"30g"},{n:"Flaked almonds",q:"30g"},
+  ]},
+  { cat:"Fresh Herbs & Spices", icon:"🌿", items:[
+    {n:"Fresh flat-leaf parsley",q:"2 bunches"},{n:"Fresh basil",q:"1 bunch"},
+    {n:"Fresh thyme",q:"1 pack"},
+    {n:"Ground cumin",q:"check stock"},{n:"Ground cinnamon",q:"check stock"},
+    {n:"Ground allspice",q:"check stock"},{n:"Smoked paprika",q:"check stock"},
+    {n:"Turmeric",q:"check stock"},{n:"Dried oregano",q:"check stock"},
+    {n:"Chilli flakes",q:"check stock"},
+  ]},
+  { cat:"Stock", icon:"🍲", items:[
+    {n:"Beef stock — Salsus (via Fine & Wild)",q:"1 litre total"},
+    {n:"Vegetable stock (carton)",q:"1.2 litres total"},
+  ]},
+  { cat:"Oat Milk Supplies", icon:"🥛", items:[
+    {n:"Calcium carbonate powder",q:"check stock"},
+    {n:"Liquid vitamin D3 drops",q:"check stock"},
+  ]},
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const openDays = {mon:true};
+const openCats = {};
+const checkedItems = {};
+
+// ── RENDER PLAN ───────────────────────────────────────────────────────────────
+function renderPlan() {
+  const container = document.getElementById('tab-plan');
+  container.innerHTML = DAYS.map(day => {
+    const isOpen = !!openDays[day.id];
+    return `
+    <div class="day-card">
+      <div class="day-header" onclick="toggleDay('${day.id}')">
+        <div class="day-left">
+          <div class="day-dot" style="background:${day.dotBg};color:${day.dotColor}">${day.name.slice(0,2)}</div>
+          <div>
+            <div class="day-name">${day.name}</div>
+            <div class="day-date">${day.date}</div>
+          </div>
+        </div>
+        <div class="day-right">
+          <span class="day-kcal">${day.kcal} kcal</span>
+          <span class="day-serves">&#128100; ${day.serves}</span>
+          <span class="day-chevron${isOpen?' open':''}" id="chev-${day.id}">&#x2304;</span>
+        </div>
+      </div>
+      ${day.defrost ? `<div class="defrost-note" id="defrost-${day.id}" style="display:${isOpen?'block':'none'}">${day.defrost}</div>` : ''}
+      <div class="day-body${isOpen?' open':''}" id="body-${day.id}">
+        <div class="meals">
+          ${day.meals.map(m => `
+          <div class="meal-card ${m.slot}">
+            <div class="meal-head ${m.slot}-head">${m.label} &middot; ${m.kcal} kcal</div>
+            <div class="meal-body">
+              <div class="meal-name">${m.name}</div>
+              <div class="meal-desc">${m.desc}</div>
+              <div class="tags">${m.tags.map(t=>`<span class="tag tag-${t}">${TAG_LABELS[t]||t}</span>`).join('')}</div>
+              <button class="recipe-btn" onclick="openRecipe('${day.id}','${m.slot}')">View recipe &rarr;</button>
+            </div>
+          </div>`).join('')}
+        </div>
+        <div class="macros">
+          ${Object.entries(day.macros).map(([k,v])=>`<span class="mpill">${k}: ${v}</span>`).join('')}
+          <span class="mpill">&#127807; ${day.plants} plants</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDay(id) {
+  openDays[id] = !openDays[id];
+  document.getElementById('body-'+id).classList.toggle('open', openDays[id]);
+  document.getElementById('chev-'+id).classList.toggle('open', openDays[id]);
+  const defrost = document.getElementById('defrost-'+id);
+  if (defrost) defrost.style.display = openDays[id] ? 'block' : 'none';
+}
+
+// ── RENDER SHOPPING ───────────────────────────────────────────────────────────
+function renderShopping() {
+  const grid = document.getElementById('shop-grid');
+  const total = SHOPPING.reduce((s,c)=>s+c.items.length,0);
+  grid.innerHTML = SHOPPING.map(cat => {
+    const isOpen = openCats[cat.cat] !== false;
+    return `
+    <div class="shop-cat">
+      <div class="shop-cat-head" onclick="toggleCat('${cat.cat}')">
+        <span class="shop-cat-icon">${cat.icon}</span>
+        <span class="shop-cat-name">${cat.cat}</span>
+        <span class="shop-cat-count">${cat.items.length} items</span>
+        <span class="shop-cat-chev" id="cchev-${cat.cat}">${isOpen?'&#x2304;':'&rsaquo;'}</span>
+      </div>
+      <div id="citems-${cat.cat}" style="display:${isOpen?'block':'none'}">
+        <div class="shop-items">
+          ${cat.items.map((item,i) => {
+            const key = cat.cat+'__'+i;
+            const isChecked = !!checkedItems[key];
+            return `
+            <div class="shop-item" onclick="toggleCheck('${cat.cat}',${i})">
+              <div class="shop-check${isChecked?' checked':''}" id="chk-${cat.cat}-${i}">
+                <span class="shop-check-tick">${isChecked?'&#x2713;':''}</span>
+              </div>
+              <span class="shop-item-name${isChecked?' checked':''}" id="iname-${cat.cat}-${i}">${item.n}</span>
+              ${item.f?'<span class="shop-item-freezer">&#x1F9CA; freezer</span>':''}
+              <span class="shop-item-qty">${item.q}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  updateProgress(total);
+}
+
+function toggleCat(cat) {
+  openCats[cat] = openCats[cat] === false ? true : false;
+  document.getElementById('citems-'+cat).style.display = openCats[cat] === false ? 'none' : 'block';
+  document.getElementById('cchev-'+cat).innerHTML = openCats[cat] === false ? '&rsaquo;' : '&#x2304;';
+}
+
+function toggleCheck(cat, i) {
+  const key = cat+'__'+i;
+  checkedItems[key] = !checkedItems[key];
+  const chk = document.getElementById('chk-'+cat+'-'+i);
+  const name = document.getElementById('iname-'+cat+'-'+i);
+  const tick = chk.querySelector('.shop-check-tick');
+  chk.classList.toggle('checked', checkedItems[key]);
+  name.classList.toggle('checked', checkedItems[key]);
+  tick.innerHTML = checkedItems[key] ? '&#x2713;' : '';
+  const total = SHOPPING.reduce((s,c)=>s+c.items.length,0);
+  updateProgress(total);
+}
+
+function updateProgress(total) {
+  const checked = Object.values(checkedItems).filter(Boolean).length;
+  document.getElementById('prog-text').textContent = checked + ' / ' + total;
+  document.getElementById('prog-fill').style.width = (total?(checked/total*100):0)+'%';
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openRecipe(dayId, slot) {
+  const day = DAYS.find(d=>d.id===dayId);
+  const meal = day.meals.find(m=>m.slot===slot);
+  const slotLabel = {b:'Breakfast',l:'Lunch',d:'Dinner'}[slot];
+  document.getElementById('modal-inner').innerHTML = `
+    <button class="modal-close" onclick="closeModalBtn()">&#x2715;</button>
+    <div class="modal-eye">${day.name} &middot; ${slotLabel}</div>
+    <div class="modal-title">${meal.name}</div>
+    <div class="modal-desc">${meal.desc}</div>
+    <span class="modal-serves">&#128100; Serves ${meal.serves}</span>
+    <span class="modal-kcal">&#9889; ${meal.kcal} kcal per person</span>
+    <div class="modal-sec">Ingredients</div>
+    <ul class="ing-list">
+      ${meal.ings.map(([n,q])=>`<li class="ing-item"><span>${n}</span><span class="ing-qty">${q}</span></li>`).join('')}
+    </ul>
+    <div class="modal-sec">Method</div>
+    <ul class="steps-list">
+      ${meal.steps.map((s,i)=>`<li class="step"><div class="step-num">${i+1}</div><div class="step-text">${s}</div></li>`).join('')}
+    </ul>
+    ${meal.note?`<div class="note-box">&#128161; ${meal.note}</div>`:''}
+  `;
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeModalBtn() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function closeModal(e) {
+  if(e.target===document.getElementById('modal')) closeModalBtn();
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function showTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderPlan();
+renderShopping();
+</script>
+</body>
+</html>
