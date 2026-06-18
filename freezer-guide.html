@@ -372,6 +372,101 @@ const items = [
     ],
     bestFor: "Anywhere cooked — stir-fries, soups, sauces, roasts, marinades. Texture softens so not suitable for raw use like dressings after freezing.",
     tip: "Frozen garlic can turn slightly green or blue when cooked — a harmless natural reaction. No need to thaw before use."
+  },
+  {
+    name: "Fresh Thyme",
+    category: "herb",
+    freezeType: "yes",
+    freezeLabel: "No blanching",
+    duration: "Up to 6 months (best in first 3)",
+    steps: [
+      "Rinse and pat completely dry",
+      "Lay sprigs flat in a freezer bag or container, press out air, label and date — no need to chop, leaves crumble off easily once frozen",
+      "Alternative: strip leaves from stems, spread on a tray, open-freeze for 1 hour, then transfer to a bag",
+      "Ice cube method: pack leaves into ice cube trays, top with olive oil or water, freeze solid, then bag up"
+    ],
+    bestFor: "Soups, stews, roasts, marinades, sauces — anywhere cooked. Texture softens so not suitable as a fresh garnish after freezing.",
+    tip: "Whole sprigs are the easiest option — just pull one out and crumble the frozen leaves straight into the pot."
+  },
+  {
+    name: "White Onion",
+    category: "vegetable",
+    freezeType: "yes",
+    freezeLabel: "No blanching",
+    duration: "Up to 12 months (best in first 6)",
+    steps: [
+      "Peel and chop or slice to your preferred size",
+      "Spread on a tray and open-freeze for 1–2 hours until solid — stops pieces clumping together",
+      "Transfer to a freezer bag, press out all air, label and date"
+    ],
+    bestFor: "Anywhere cooked — soups, stews, sauces, stir-fries, casseroles. Texture softens significantly, so not suitable for raw use (salads, salsas, garnishes) after freezing.",
+    tip: "No need to thaw — go straight from freezer to pan. Use a well-sealed bag, as onion smell can transfer to other freezer items."
+  },
+  {
+    name: "Celery",
+    category: "vegetable",
+    freezeType: "blanch",
+    freezeLabel: "Blanch first",
+    duration: "Up to 12 months",
+    steps: [
+      "Wash and chop to your preferred size",
+      "Blanch in boiling water for 2–3 minutes",
+      "Plunge immediately into ice water for the same time to stop cooking",
+      "Drain thoroughly and pat dry",
+      "Open-freeze on a tray for 1–2 hours until solid",
+      "Transfer to bags, press out all air, label and date"
+    ],
+    bestFor: "Soups, stews, stocks, casseroles. Texture goes very soft — not suitable for raw or salad use after freezing.",
+    tip: "If only using for stocks/soups, you can skip blanching and freeze raw chopped pieces — texture won't matter as much."
+  },
+  {
+    name: "Carrots",
+    category: "vegetable",
+    freezeType: "blanch",
+    freezeLabel: "Blanch first",
+    duration: "Up to 12 months",
+    steps: [
+      "Peel and chop or slice to your preferred size",
+      "Blanch in boiling water — 2 minutes for smaller pieces, 3–4 minutes for larger chunks or whole",
+      "Plunge immediately into ice water for the same time to stop cooking",
+      "Drain thoroughly and pat dry",
+      "Open-freeze on a tray for 1–2 hours until solid",
+      "Transfer to bags, press out all air, label and date"
+    ],
+    bestFor: "Soups, stews, roasts, mash, stir-fries. Texture softens — not ideal for raw use (sticks, salads) after freezing.",
+    tip: "Blanching preserves the colour, texture and nutrients far better than freezing raw."
+  },
+  {
+    name: "Radishes",
+    category: "vegetable",
+    freezeType: "blanch",
+    freezeLabel: "Blanch first",
+    duration: "Up to 8–10 months",
+    steps: [
+      "Wash, trim tops, and slice or quarter",
+      "Blanch in boiling water for 2–3 minutes — helps mellow bitterness and preserve texture",
+      "Plunge immediately into ice water for the same time",
+      "Drain thoroughly and pat dry",
+      "Open-freeze on a tray for 1–2 hours until solid",
+      "Transfer to bags, press out all air, label and date"
+    ],
+    bestFor: "Roasted, sautéed, or added to soups and stews — frozen radishes taste similar to turnips once cooked, with a milder flavour. Not suitable for salads, slaws, or any raw use — texture turns soft and watery.",
+    tip: "If you have a glut, pickling or quick-roasting fresh is often a better use — the texture change after freezing is quite noticeable."
+  },
+  {
+    name: "Ginger",
+    category: "vegetable",
+    freezeType: "yes",
+    freezeLabel: "No blanching",
+    duration: "Up to 12 months",
+    steps: [
+      "No need to peel — skin grates away easily when frozen",
+      "Wrap the whole piece tightly in a freezer bag, press out air, label and date",
+      "Grate or slice directly from frozen as needed, then return the rest to the freezer",
+      "Alternative: peel and grate or mince first, then freeze flat in a bag or in ice cube trays for pre-measured portions"
+    ],
+    bestFor: "Stir-fries, curries, marinades, teas, baking — anywhere cooked or grated in. Texture won't hold up for raw use like pickled ginger.",
+    tip: "Frozen ginger actually grates more easily than fresh — no need to thaw first."
   }
 ];
 
@@ -379,7 +474,13 @@ const freezeClass = { yes: 'freeze-yes', blanch: 'freeze-blanch', no: 'freeze-no
 
 function renderCards(filter = 'all') {
   const grid = document.getElementById('grid');
-  const filtered = filter === 'all' ? items : items.filter(i => i.category === filter);
+  const filtered = (filter === 'all' ? [...items] : items.filter(i => i.category === filter))
+    .sort((a, b) => {
+      if (filter === 'all' && a.category !== b.category) {
+        return a.category.localeCompare(b.category);
+      }
+      return a.name.localeCompare(b.name);
+    });
 
   if (filtered.length === 0) {
     grid.innerHTML = '<div class="empty-state">No items in this category yet.</div>';
