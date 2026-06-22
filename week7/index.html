@@ -1,1 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 7 Meal Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --card: #FFFFFF;
+    --accent: #5B8A6F;
+    --accent-light: #EAF2ED;
+    --warm: #C4773B;
+    --warm-light: #FDF0E6;
+    --text: #1E1E1E;
+    --muted: #6B6B6B;
+    --border: #E0DDD7;
+    --tag-b: #DBEAFE; --tag-b-text: #1E40AF;
+    --tag-l: #FEF9C3; --tag-l-text: #854D0E;
+    --tag-d: #FCE7F3; --tag-d-text: #9D174D;
+    --green: #10B981;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 16px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .header {
+    background: linear-gradient(135deg, var(--accent) 0%, #3D6B54 100%);
+    border-radius: 20px;
+    padding: 28px 24px;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  .header .eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; opacity: 0.8; margin-bottom: 6px;
+  }
+  .header h1 { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+  .header p { opacity: 0.85; font-size: 14px; margin-bottom: 20px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  .stat-box {
+    background: rgba(255,255,255,0.15); border-radius: 12px;
+    padding: 12px 10px; text-align: center;
+  }
+  .stat-box .val { font-weight: 800; font-size: 20px; }
+  .stat-box .lbl { font-size: 10px; opacity: 0.8; }
+  .stat-box .sub { font-size: 10px; opacity: 0.65; }
 
+  .callout {
+    background: var(--warm-light); border: 1px solid #FDBA74;
+    border-radius: 12px; padding: 12px 16px; margin-bottom: 20px;
+    font-size: 13px; color: var(--warm);
+  }
+  .callout strong { color: var(--warm); }
+
+  .hint { font-size: 12px; color: var(--muted); margin-bottom: 12px; padding-left: 4px; }
+
+  .card {
+    background: var(--card); border-radius: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 12px; overflow: hidden;
+  }
+  .day-toggle {
+    width: 100%; background: none; border: none; cursor: pointer;
+    padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+    text-align: left; font-family: inherit;
+  }
+  .day-left { display: flex; align-items: center; gap: 14px; }
+  .day-badge {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--accent-light); display: flex; align-items: center;
+    justify-content: center; font-weight: 800; font-size: 15px; color: var(--accent);
+    flex-shrink: 0;
+  }
+  .day-name { font-weight: 700; font-size: 16px; }
+  .day-theme { font-size: 12px; color: var(--muted); }
+  .day-right { display: flex; align-items: center; gap: 10px; }
+  .day-cals { font-weight: 700; font-size: 15px; color: var(--accent); text-align: right; }
+  .day-pts { font-size: 11px; color: var(--muted); text-align: right; }
+  .chevron { font-size: 18px; color: var(--muted); transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+
+  .day-body { padding: 0 20px 20px; display: none; }
+  .day-body.open { display: block; }
+
+  .defrost {
+    background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 10px;
+    padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: #92400E;
+  }
+
+  .meal-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 16px; }
+  @media (max-width: 480px) { .meal-grid { grid-template-columns: 1fr; } }
+  .meal-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 10px; cursor: pointer; text-align: left;
+    font-family: inherit;
+  }
+  .meal-name { font-weight: 600; font-size: 13px; margin-top: 8px; margin-bottom: 4px; line-height: 1.3; }
+  .meal-meta { font-size: 11px; color: var(--muted); }
+  .meal-plants { font-size: 11px; color: var(--accent); margin-top: 4px; }
+  .meal-cta { font-size: 10px; color: var(--warm); margin-top: 4px; }
+
+  .tag {
+    border-radius: 9999px; padding: 2px 10px; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.3px; display: inline-block;
+  }
+  .tag-breakfast { background: var(--tag-b); color: var(--tag-b-text); }
+  .tag-lunch { background: var(--tag-l); color: var(--tag-l-text); }
+  .tag-dinner { background: var(--tag-d); color: var(--tag-d-text); }
+
+  .plant-pill {
+    background: var(--accent-light); color: var(--accent);
+    border-radius: 9999px; padding: 2px 8px; font-size: 11px; font-weight: 500;
+    margin-right: 4px; margin-bottom: 4px; display: inline-block;
+  }
+
+  .macro-shopping-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 480px) { .macro-shopping-grid { grid-template-columns: 1fr; } }
+  .macro-box { background: var(--accent-light); border-radius: 10px; padding: 10px 14px; }
+  .plants-box { background: var(--warm-light); border-radius: 10px; padding: 10px 14px; }
+  .plants-box-title {
+    font-size: 11px; font-weight: 700; color: var(--warm); margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  .macro-row { margin-bottom: 6px; }
+  .macro-row-top { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+  .macro-row-top .val { font-weight: 600; color: var(--text); }
+  .macro-track { height: 4px; background: var(--border); border-radius: 4px; }
+  .macro-fill { height: 4px; border-radius: 4px; }
+
+  /* Shopping list */
+  .shop-toggle {
+    width: 100%; background: none; border: none; cursor: pointer;
+    padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+    font-family: inherit;
+  }
+  .shop-title { font-weight: 700; font-size: 16px; }
+  .shop-progress { display: flex; align-items: center; gap: 10px; }
+  .shop-count { font-size: 13px; color: var(--muted); }
+  .shop-bar-track { width: 80px; height: 6px; background: var(--border); border-radius: 4px; }
+  .shop-bar-fill { height: 6px; background: var(--accent); border-radius: 4px; transition: width 0.2s; }
+  .shop-body { padding: 0 20px 20px; display: none; }
+  .shop-body.open { display: block; }
+  .shop-cat { margin-bottom: 16px; }
+  .shop-cat-title {
+    font-weight: 700; font-size: 12px; color: var(--accent); text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 8px;
+  }
+  .shop-item {
+    display: flex; align-items: center; gap: 10px; padding: 6px 0;
+    cursor: pointer; border-bottom: 1px solid var(--border);
+  }
+  .shop-item.done { opacity: 0.45; }
+  .shop-checkbox {
+    width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .shop-checkbox.checked { background: var(--accent); border-color: var(--accent); }
+  .shop-checkbox.checked::after { content: '✓'; color: #fff; font-size: 11px; }
+  .shop-item-name { flex: 1; font-size: 13px; }
+  .shop-item-name.done { text-decoration: line-through; }
+  .shop-item-qty { font-size: 11px; color: var(--muted); }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000; padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--card); border-radius: 16px; max-width: 560px; width: 100%;
+    max-height: 88vh; overflow-y: auto; padding: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .modal-title { font-size: 20px; font-weight: 700; margin-top: 8px; line-height: 1.3; }
+  .modal-close {
+    background: none; border: none; font-size: 22px; cursor: pointer;
+    color: var(--muted); margin-left: 12px;
+  }
+  .modal-macros { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 20px; }
+  .modal-macro-box { background: var(--accent-light); border-radius: 10px; padding: 10px 8px; text-align: center; }
+  .modal-macro-val { font-size: 18px; font-weight: 700; color: var(--accent); }
+  .modal-macro-unit, .modal-macro-lbl { font-size: 10px; color: var(--muted); }
+  .modal-section { margin-bottom: 16px; }
+  .modal-section-title {
+    font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .modal-section-title .serving-note { color: var(--muted); font-size: 11px; text-transform: none; font-weight: 500; }
+  .modal-list { padding-left: 18px; }
+  .modal-list li { font-size: 13px; margin-bottom: 4px; }
+  .modal-method li { margin-bottom: 6px; line-height: 1.5; }
+  .modal-notes {
+    background: var(--warm-light); border-radius: 10px; padding: 10px 14px;
+    font-size: 12px; color: var(--warm); border-left: 3px solid var(--warm);
+  }
+  .modal-tags { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .modal-tag { background: var(--border); color: var(--muted); border-radius: 9999px; padding: 2px 10px; font-size: 11px; }
+
+  .footer-note { text-align: center; margin-top: 24px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="eyebrow">Gut Health · Zero UPF · Cholesterol-Conscious</div>
+  <h1>Week 7 Meal Plan</h1>
+  <p>Maximum variety · Eggs, chicken &amp; plants · Heart-healthy fats</p>
+  <div class="stat-grid">
+    <div class="stat-box"><div class="val" id="statCalories">–</div><div class="lbl">Avg Daily</div><div class="sub">target ~1,662</div></div>
+    <div class="stat-box"><div class="val" id="statPlants">–</div><div class="lbl">Plant Points</div><div class="sub">goal: 30+ ✓</div></div>
+    <div class="stat-box"><div class="val">7</div><div class="lbl">Cuisines</div><div class="sub">all different</div></div>
+  </div>
+</div>
+
+<div class="callout">
+  ❤️ <strong>Heart health this week:</strong> No chickpeas. Butter beans, black beans, cannellini &amp; lentils instead. Walnuts, flaxseed &amp; almonds for HDL. Lamb once (Sunday only). Olive oil throughout.
+</div>
+
+<div class="card" id="shoppingCard">
+  <button class="shop-toggle" onclick="toggleShopping()">
+    <div class="shop-title">🛒 Shopping List</div>
+    <div class="shop-progress">
+      <span class="shop-count" id="shopCount">0/0</span>
+      <div class="shop-bar-track"><div class="shop-bar-fill" id="shopBar" style="width:0%"></div></div>
+      <span class="chevron" id="shopChevron">⌄</span>
+    </div>
+  </button>
+  <div class="shop-body" id="shopBody"></div>
+</div>
+
+<div class="hint">Tap a day to expand · Tap a meal for the full recipe</div>
+<div id="daysContainer"></div>
+
+<div class="footer-note">Week 7 · Tim Spector gut health principles · Plenish oat milk throughout</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal-box" id="modalBox"></div>
+</div>
+
+<script>
+const SERVING_MAP = {
+  Mon: 2, Tue: 1, Wed: 1, Thu: 1,
+  FriB: 1, FriL: 1, FriD: 2,
+  Sat: 2, Sun: 2,
+};
+
+const days = [
+  {
+    day: "Monday", short: "Mon", theme: "Japanese-inspired", defrost: null,
+    meals: {
+      breakfast: {
+        name: "Cacao & Hazelnut Overnight Oats", servingKey: "Mon",
+        calories: 400, protein: 14, carbs: 50, fat: 15, fibre: 8,
+        plants: ["oats", "cacao powder", "hazelnuts", "banana", "flaxseed"],
+        tags: ["Overnight prep", "Chocolatey", "Heart-healthy"],
+        ingredients: [
+          "80g rolled oats (per 2 servings total)",
+          "300ml Plenish oat milk",
+          "2 tbsp raw cacao powder",
+          "1 tbsp maple syrup",
+          "2 tsp ground flaxseed",
+          "1 small banana, sliced",
+          "30g hazelnuts, roughly chopped",
+          "2 tbsp natural live yogurt"
+        ],
+        method: [
+          "Whisk cacao powder, maple syrup and flaxseed into oat milk until smooth and no lumps remain.",
+          "Stir through oats, cover and refrigerate overnight.",
+          "In the morning, top with sliced banana, chopped hazelnuts and a spoonful of live yogurt."
+        ],
+        notes: "Serves 2. Hazelnuts and flaxseed support HDL; cacao is rich in polyphenols. Live yogurt = fermented food."
+      },
+      lunch: {
+        name: "Butter Bean & Roasted Red Pepper Soup", servingKey: "Mon",
+        calories: 340, protein: 15, carbs: 44, fat: 9, fibre: 11,
+        plants: ["butter beans", "red pepper", "onion", "garlic", "tomato", "rosemary", "lemon"],
+        tags: ["High fibre", "Quick", "Batch-friendly"],
+        ingredients: [
+          "2 × 400g tins butter beans, drained",
+          "2 roasted red peppers (from jar or roast own)",
+          "1 large onion, diced",
+          "4 cloves garlic",
+          "400g tin chopped tomatoes",
+          "700ml homemade chicken or veg stock",
+          "2 sprigs rosemary",
+          "2 tbsp olive oil",
+          "Juice of 1 lemon",
+          "Salt & pepper",
+          "Sourdough to serve"
+        ],
+        method: [
+          "Soften onion and garlic in olive oil over medium heat, 8 mins.",
+          "Add tomatoes, roasted peppers, rosemary and stock. Simmer 15 mins.",
+          "Add butter beans, simmer 5 more mins.",
+          "Remove rosemary, blend half the soup for a creamy-chunky texture.",
+          "Finish with lemon juice, season well. Serve with sourdough."
+        ],
+        notes: "Serves 2. Make a big batch — freezes well. Butter beans are excellent for soluble fibre and LDL management."
+      },
+      dinner: {
+        name: "Teriyaki Chicken Bowl with Brown Rice & Pickled Cucumber", servingKey: "Mon",
+        calories: 520, protein: 42, carbs: 54, fat: 11, fibre: 5,
+        plants: ["brown rice", "cucumber", "edamame", "spring onion", "sesame seeds", "ginger", "garlic"],
+        tags: ["Japanese", "Lean protein", "Polyphenol-rich"],
+        ingredients: [
+          "2 chicken breasts",
+          "3 tbsp low-sodium soy sauce",
+          "1 tbsp honey",
+          "1 tbsp rice vinegar",
+          "1 tsp fresh ginger, grated",
+          "2 cloves garlic, minced",
+          "1 tsp sesame oil",
+          "200g brown rice",
+          "1 cucumber, thinly sliced",
+          "2 tbsp rice vinegar (for pickling)",
+          "1 tsp sugar",
+          "80g edamame, thawed",
+          "2 spring onions",
+          "1 tbsp sesame seeds"
+        ],
+        method: [
+          "Cook brown rice per packet instructions.",
+          "Mix soy, honey, rice vinegar, ginger, garlic for marinade. Marinate chicken 20 mins.",
+          "Quickly pickle cucumber: toss with rice vinegar, sugar, pinch of salt. Set aside.",
+          "Pan-fry chicken 5–6 mins each side, basting with marinade.",
+          "Slice chicken. Bowl up rice, top with chicken, edamame, pickled cucumber, spring onion, sesame seeds."
+        ],
+        notes: "Serves 2. Quick-pickle cucumber adds a probiotic-friendly acidic element."
+      }
+    }
+  },
+  {
+    day: "Tuesday", short: "Tue", theme: "Spanish / Mediterranean", defrost: null,
+    meals: {
+      breakfast: {
+        name: "Walnut & Berry Overnight Oats", servingKey: "Tue",
+        calories: 385, protein: 13, carbs: 50, fat: 14, fibre: 8,
+        plants: ["oats", "walnuts", "blueberries", "chia seeds", "flaxseed"],
+        tags: ["Overnight prep", "Omega-3 rich", "Heart-healthy"],
+        ingredients: [
+          "40g rolled oats",
+          "150ml Plenish oat milk",
+          "1 tbsp chia seeds",
+          "1 tsp ground flaxseed",
+          "1 tsp maple syrup",
+          "80g blueberries",
+          "20g walnuts, roughly chopped",
+          "1 tbsp natural live yogurt"
+        ],
+        method: [
+          "Combine oats, oat milk, chia seeds, flaxseed and maple syrup. Stir well.",
+          "Cover and refrigerate overnight.",
+          "In the morning, top with blueberries, walnuts and a spoonful of live yogurt."
+        ],
+        notes: "Serves 1. Walnuts and flaxseed are excellent for raising HDL. Live yogurt = fermented food."
+      },
+      lunch: {
+        name: "Spanish Lentil & Smoked Paprika Stew (Lentejas)", servingKey: "Tue",
+        calories: 360, protein: 18, carbs: 48, fat: 8, fibre: 14,
+        plants: ["green lentils", "carrot", "celery", "onion", "garlic", "smoked paprika", "tomato", "bay leaf", "parsley"],
+        tags: ["Spanish", "High fibre", "Plant-based"],
+        ingredients: [
+          "200g green lentils, rinsed",
+          "1 carrot, diced",
+          "2 sticks celery, diced",
+          "1 onion, diced",
+          "3 cloves garlic",
+          "400g tin chopped tomatoes",
+          "700ml veg stock",
+          "2 tsp smoked paprika",
+          "1 tsp cumin",
+          "1 bay leaf",
+          "2 tbsp olive oil",
+          "Handful flat-leaf parsley",
+          "Sherry vinegar to finish"
+        ],
+        method: [
+          "Soften onion, carrot, celery in olive oil 8 mins.",
+          "Add garlic, smoked paprika, cumin — cook 1 min.",
+          "Add lentils, tomatoes, stock and bay leaf. Simmer 25–30 mins until lentils tender.",
+          "Finish with a splash of sherry vinegar and lots of parsley."
+        ],
+        notes: "Serves 1 (make more and refrigerate for Wed lunch). Lentils are one of the best foods for LDL reduction."
+      },
+      dinner: {
+        name: "Roast Chicken Breast with Romesco & Charred Tenderstem", servingKey: "Tue",
+        calories: 490, protein: 44, carbs: 22, fat: 18, fibre: 7,
+        plants: ["tenderstem broccoli", "roasted red pepper", "almonds", "tomato", "garlic", "smoked paprika", "olive oil"],
+        tags: ["Spanish", "High protein", "Polyphenol-rich"],
+        ingredients: [
+          "1 large chicken breast",
+          "2 roasted red peppers",
+          "50g blanched almonds",
+          "1 ripe tomato",
+          "2 cloves garlic",
+          "1 tsp smoked paprika",
+          "3 tbsp olive oil",
+          "1 tbsp sherry vinegar",
+          "200g tenderstem broccoli",
+          "Salt & pepper"
+        ],
+        method: [
+          "Make romesco: blend peppers, almonds, tomato, garlic, paprika, 2 tbsp olive oil, sherry vinegar until slightly chunky. Season.",
+          "Season chicken, roast at 200°C for 22–25 mins.",
+          "Toss tenderstem in olive oil, char in a hot griddle pan or oven tray alongside.",
+          "Serve chicken sliced over romesco with tenderstem on the side."
+        ],
+        notes: "Serves 1. Almonds in romesco contribute to HDL support."
+      }
+    }
+  },
+  {
+    day: "Wednesday", short: "Wed", theme: "Indian-inspired", defrost: null,
+    meals: {
+      breakfast: {
+        name: "Cardamom, Pistachio & Mango Overnight Oats", servingKey: "Wed",
+        calories: 380, protein: 12, carbs: 54, fat: 13, fibre: 7,
+        plants: ["oats", "mango", "pistachios", "cardamom", "ginger"],
+        tags: ["Overnight prep", "Exotic", "Polyphenol-rich"],
+        ingredients: [
+          "40g rolled oats",
+          "150ml Plenish oat milk",
+          "½ tsp ground cardamom",
+          "½ tsp fresh ginger, grated",
+          "1 tsp honey",
+          "80g mango, diced (fresh or frozen)",
+          "20g pistachios, roughly chopped",
+          "1 tbsp live yogurt"
+        ],
+        method: [
+          "Combine oats, oat milk, cardamom, ginger and honey. Stir well.",
+          "Cover and refrigerate overnight.",
+          "Top with mango, pistachios and live yogurt in the morning."
+        ],
+        notes: "Serves 1. Cardamom and mango are polyphenol-rich. Live yogurt = fermented food."
+      },
+      lunch: {
+        name: "Leftover Lentejas with Sourdough", servingKey: "Wed",
+        calories: 350, protein: 18, carbs: 48, fat: 8, fibre: 14,
+        plants: ["green lentils", "carrot", "celery", "onion", "garlic", "smoked paprika", "tomato", "parsley"],
+        tags: ["No cook", "High fibre", "Batch"],
+        ingredients: [
+          "Leftover lentejas from Tuesday",
+          "1 slice sourdough",
+          "Extra parsley to refresh"
+        ],
+        method: [
+          "Reheat stew gently on hob with a splash of water if needed.",
+          "Top with fresh parsley and serve with sourdough."
+        ],
+        notes: "Serves 1. Zero extra cook time."
+      },
+      dinner: {
+        name: "Black Bean & Egg Shakshuka with Cumin-Roast Sweet Potato", servingKey: "Wed",
+        calories: 480, protein: 22, carbs: 56, fat: 16, fibre: 13,
+        plants: ["black beans", "tomato", "red pepper", "onion", "garlic", "cumin", "sweet potato", "spinach", "chilli"],
+        tags: ["Eggs", "High fibre", "Middle Eastern-ish"],
+        ingredients: [
+          "1 × 400g tin black beans, drained",
+          "400g tin chopped tomatoes",
+          "1 red pepper, diced",
+          "1 onion, diced",
+          "3 cloves garlic",
+          "1 tsp cumin",
+          "1 tsp smoked paprika",
+          "Pinch chilli flakes",
+          "2 large eggs",
+          "Handful spinach",
+          "1 medium sweet potato",
+          "1 tbsp olive oil",
+          "Fresh parsley or mint to serve"
+        ],
+        method: [
+          "Cube sweet potato, toss in olive oil and cumin, roast at 200°C for 25 mins.",
+          "Soften onion and pepper in olive oil 7 mins. Add garlic and spices, cook 1 min.",
+          "Add tomatoes and black beans, simmer 10 mins. Wilt in spinach.",
+          "Make wells, crack in eggs. Cover and cook 5–6 mins to your liking.",
+          "Serve shakshuka with sweet potato on the side and fresh herbs."
+        ],
+        notes: "Serves 1. Black beans offer excellent LDL-lowering soluble fibre. No chickpeas this week."
+      }
+    }
+  },
+  {
+    day: "Thursday", short: "Thu", theme: "Italian", defrost: null,
+    meals: {
+      breakfast: {
+        name: "Apple, Cinnamon & Pecan Overnight Oats", servingKey: "Thu",
+        calories: 375, protein: 11, carbs: 52, fat: 14, fibre: 8,
+        plants: ["oats", "apple", "pecans", "cinnamon", "flaxseed"],
+        tags: ["Overnight prep", "Heart-healthy", "Warming"],
+        ingredients: [
+          "40g rolled oats",
+          "150ml Plenish oat milk",
+          "½ apple, grated",
+          "1 tsp ground cinnamon",
+          "1 tsp maple syrup",
+          "1 tsp ground flaxseed",
+          "20g pecans, roughly broken",
+          "1 tbsp live yogurt"
+        ],
+        method: [
+          "Mix oats, oat milk, grated apple, cinnamon, flaxseed and maple syrup.",
+          "Cover and refrigerate overnight.",
+          "Top with pecans and live yogurt in the morning."
+        ],
+        notes: "Serves 1. Grated apple adds pectin — excellent soluble fibre for LDL. Live yogurt = fermented food."
+      },
+      lunch: {
+        name: "Cannellini Bean & Cavolo Nero Ribollita", servingKey: "Thu",
+        calories: 345, protein: 16, carbs: 46, fat: 9, fibre: 12,
+        plants: ["cannellini beans", "cavolo nero", "carrot", "celery", "onion", "garlic", "rosemary", "tomato", "sourdough"],
+        tags: ["Italian", "High fibre", "Warming"],
+        ingredients: [
+          "1 × 400g tin cannellini beans, drained",
+          "100g cavolo nero (or savoy cabbage), shredded",
+          "1 carrot, diced",
+          "2 sticks celery, diced",
+          "1 onion, diced",
+          "3 cloves garlic",
+          "400g tin chopped tomatoes",
+          "500ml veg stock",
+          "1 sprig rosemary",
+          "2 tbsp olive oil",
+          "1 slice day-old sourdough, torn",
+          "Extra virgin olive oil to finish"
+        ],
+        method: [
+          "Soften onion, carrot, celery in olive oil 8 mins. Add garlic and rosemary, cook 1 min.",
+          "Add tomatoes and stock, simmer 15 mins.",
+          "Add beans and cavolo nero, cook 10 more mins.",
+          "Stir in torn sourdough — it should thicken the soup.",
+          "Finish with a generous drizzle of extra virgin olive oil."
+        ],
+        notes: "Serves 1. Classic Tuscan peasant soup. Ribollita means 'reboiled' — even better the next day."
+      },
+      dinner: {
+        name: "Lemon & Herb Chicken with Cannellini Mash & Wilted Greens", servingKey: "Thu",
+        calories: 495, protein: 46, carbs: 36, fat: 13, fibre: 10,
+        plants: ["cannellini beans", "lemon", "thyme", "rosemary", "garlic", "spinach", "cherry tomatoes"],
+        tags: ["Italian", "High protein", "Lean"],
+        ingredients: [
+          "1 large chicken breast",
+          "Juice and zest of 1 lemon",
+          "1 sprig rosemary, chopped",
+          "1 tsp thyme",
+          "2 cloves garlic, minced",
+          "2 tbsp olive oil",
+          "1 × 400g tin cannellini beans, drained",
+          "50ml veg stock",
+          "100g spinach",
+          "100g cherry tomatoes",
+          "Salt & pepper"
+        ],
+        method: [
+          "Marinate chicken in lemon, rosemary, thyme, garlic and 1 tbsp olive oil for 20 mins.",
+          "Pan-fry chicken 5–6 mins each side until golden and cooked through.",
+          "For mash: warm cannellini beans with stock, mash roughly with olive oil, lemon zest and seasoning.",
+          "Wilt spinach in the same pan; add cherry tomatoes and warm through.",
+          "Serve chicken over cannellini mash with greens."
+        ],
+        notes: "Serves 1. Creamy cannellini mash is a brilliant low-sat-fat alternative to butter mash."
+      }
+    }
+  },
+  {
+    day: "Friday", short: "Fri", theme: "Mexican / Mediterranean", defrost: null,
+    meals: {
+      breakfast: {
+        name: "Peanut Butter & Banana Overnight Oats", servingKey: "FriB",
+        calories: 420, protein: 15, carbs: 56, fat: 16, fibre: 8,
+        plants: ["oats", "banana", "peanut butter", "chia seeds", "cacao nibs"],
+        tags: ["Overnight prep", "Satisfying", "Energy boost"],
+        ingredients: [
+          "40g rolled oats",
+          "150ml Plenish oat milk",
+          "1 tbsp natural peanut butter (100% peanuts)",
+          "1 tsp chia seeds",
+          "½ banana, sliced",
+          "1 tsp cacao nibs",
+          "1 tsp honey"
+        ],
+        method: [
+          "Stir oats, oat milk, peanut butter, chia seeds and honey together.",
+          "Cover and refrigerate overnight.",
+          "Top with banana and cacao nibs in the morning."
+        ],
+        notes: "Serves 1. Natural peanut butter (just peanuts) is UPF-compliant and a good unsaturated fat source."
+      },
+      lunch: {
+        name: "Black Bean Tacos with Avocado, Pickled Red Onion & Lime", servingKey: "FriL",
+        calories: 430, protein: 16, carbs: 52, fat: 17, fibre: 14,
+        plants: ["black beans", "avocado", "red onion", "lime", "cumin", "smoked paprika", "lettuce", "tomato"],
+        tags: ["Mexican", "Plant-based", "High fibre"],
+        ingredients: [
+          "1 × 400g tin black beans, drained (use half)",
+          "1 tsp cumin",
+          "1 tsp smoked paprika",
+          "½ avocado, sliced",
+          "½ red onion, thinly sliced",
+          "3 tbsp red wine vinegar",
+          "1 tsp sugar",
+          "2 slices sourdough, toasted (or homemade sourdough flatbread)",
+          "Handful little gem lettuce",
+          "1 tomato, diced",
+          "Juice of 1 lime",
+          "Pinch chilli flakes"
+        ],
+        method: [
+          "Quick-pickle red onion: pour boiling water over onion, drain, then cover with red wine vinegar, sugar and salt. Rest 15 mins.",
+          "Warm black beans with cumin, paprika, lime juice and a splash of water.",
+          "Serve beans on sourdough toast with avocado, pickled onion, lettuce and tomato."
+        ],
+        notes: "Serves 1. Sourdough toast or homemade flatbread only — no shop-bought wraps."
+      }
+    }
+  },
+  {
+    day: "Sunday", short: "Sun", theme: "Special breakfast + cosy comfort", defrost: null,
+    meals: {
+      breakfast: {
+        name: "Ricotta Pancakes with Blueberry Compote", servingKey: "Sun",
+        calories: 430, protein: 18, carbs: 48, fat: 18, fibre: 6,
+        plants: ["oat flour", "blueberries", "lemon", "vanilla"],
+        tags: ["Sunday special", "Eggs", "Indulgent-but-clean"],
+        ingredients: [
+          "250g ricotta",
+          "3 eggs, separated",
+          "80g oat flour (blitz oats)",
+          "1 tsp baking powder",
+          "1 tbsp honey",
+          "Zest of 1 lemon",
+          "1 tsp vanilla extract",
+          "Pinch salt",
+          "200g blueberries",
+          "1 tbsp maple syrup",
+          "Squeeze of lemon",
+          "Olive oil for cooking"
+        ],
+        method: [
+          "Make compote: simmer blueberries with maple syrup and lemon until jammy, 8 mins. Set aside.",
+          "Mix ricotta, egg yolks, oat flour, baking powder, honey, lemon zest and vanilla.",
+          "Whisk egg whites to soft peaks, fold gently into batter.",
+          "Cook tablespoon-sized pancakes in a little olive oil over medium-low heat, 2–3 mins each side.",
+          "Serve stacked with warm blueberry compote."
+        ],
+        notes: "Serves 2. Oat flour is blitzed from your existing oats — no separate purchase. Freezes well up to 2 months."
+      },
+      dinner: {
+        name: "Roast Vegetable & Lentil Tray with Tahini Dressing", servingKey: "Sun",
+        calories: 440, protein: 19, carbs: 50, fat: 16, fibre: 14,
+        plants: ["red lentils", "aubergine", "courgette", "red pepper", "red onion", "garlic", "cumin", "tahini", "lemon", "parsley"],
+        tags: ["Middle Eastern", "Plant-based", "High fibre"],
+        ingredients: [
+          "200g red lentils, rinsed",
+          "1 aubergine, cubed",
+          "1 courgette, sliced",
+          "1 red pepper, chunked",
+          "1 red onion, wedged",
+          "4 cloves garlic",
+          "2 tsp cumin",
+          "1 tsp smoked paprika",
+          "3 tbsp olive oil",
+          "3 tbsp tahini",
+          "Juice of 1 lemon",
+          "1 clove garlic (for dressing)",
+          "2–3 tbsp water",
+          "Large handful flat-leaf parsley"
+        ],
+        method: [
+          "Roast aubergine, courgette, pepper and onion with cumin, paprika and olive oil at 200°C for 30 mins.",
+          "Simmer lentils in water or veg stock until tender, 15–20 mins. Drain.",
+          "Make tahini dressing: whisk tahini, lemon, garlic and water until smooth and pourable.",
+          "Layer lentils and roast veg in bowls. Drizzle generously with tahini dressing.",
+          "Scatter over parsley."
+        ],
+        notes: "Serves 2. A satisfying, low-sat-fat Sunday dinner. Red lentils break down beautifully."
+      }
+    }
+  }
+];
+
+const plantPointTotals = { Mon: 19, Tue: 15, Wed: 16, Thu: 14, Fri: 13, Sun: 14 };
+
+const shoppingList = {
+  "Protein & Dairy": [
+    { item: "Chicken breasts (×4)", qty: "~800g" },
+    { item: "Eggs (free-range)", qty: "12" },
+    { item: "Ricotta", qty: "250g" },
+    { item: "Natural live yogurt", qty: "200g" }
+  ],
+  "Tins & Pulses": [
+    { item: "Butter beans (×2 tins)", qty: "2 × 400g" },
+    { item: "Cannellini beans (×2 tins)", qty: "2 × 400g" },
+    { item: "Black beans (×2 tins)", qty: "2 × 400g" },
+    { item: "Chopped tomatoes (×4 tins)", qty: "4 × 400g" },
+    { item: "Roasted red peppers (jar)", qty: "1 jar" },
+    { item: "Green lentils", qty: "200g dried" },
+    { item: "Red lentils", qty: "200g dried" }
+  ],
+  "Veg (Fresh)": [
+    { item: "Tenderstem broccoli", qty: "200g" },
+    { item: "Cavolo nero or savoy cabbage", qty: "100g" },
+    { item: "Spinach (baby)", qty: "300g" },
+    { item: "Cherry tomatoes", qty: "100g" },
+    { item: "Sweet potato", qty: "2 medium" },
+    { item: "Aubergine", qty: "1 large" },
+    { item: "Courgette", qty: "1 large" },
+    { item: "Red peppers", qty: "3" },
+    { item: "Carrots", qty: "2" },
+    { item: "Celery", qty: "1 head" },
+    { item: "Onions (white)", qty: "4" },
+    { item: "Red onion", qty: "2" },
+    { item: "Garlic", qty: "2 bulbs" },
+    { item: "Spring onions", qty: "1 bunch" },
+    { item: "Cucumber", qty: "1" },
+    { item: "Little gem lettuce", qty: "1" },
+    { item: "Lemons", qty: "4" },
+    { item: "Limes", qty: "1" }
+  ],
+  "Fruit": [
+    { item: "Blueberries", qty: "280g" },
+    { item: "Mango (fresh or frozen)", qty: "80g" },
+    { item: "Banana", qty: "1" },
+    { item: "Apple", qty: "1" }
+  ],
+  "Fridge / Frozen": [
+    { item: "Edamame (frozen)", qty: "80g" },
+    { item: "Plenish oat milk", qty: "2 × 1L" }
+  ],
+  "Bread & Grains": [
+    { item: "Sourdough loaf", qty: "1" },
+    { item: "Brown rice", qty: "200g" },
+    { item: "Rolled oats", qty: "500g" }
+  ],
+  "Nuts, Seeds & Oils": [
+    { item: "Walnuts", qty: "100g" },
+    { item: "Pecans", qty: "50g" },
+    { item: "Pistachios", qty: "50g" },
+    { item: "Hazelnuts", qty: "30g" },
+    { item: "Blanched almonds", qty: "50g" },
+    { item: "Sesame seeds", qty: "20g" },
+    { item: "Chia seeds", qty: "50g" },
+    { item: "Flaxseed (ground)", qty: "50g" },
+    { item: "Cacao nibs", qty: "50g" },
+    { item: "Raw cacao powder", qty: "small bag" },
+    { item: "Tahini", qty: "200g" },
+    { item: "Natural peanut butter (100% peanuts)", qty: "1 jar" },
+    { item: "Extra virgin olive oil", qty: "1 bottle" },
+    { item: "Sesame oil", qty: "small bottle" }
+  ],
+  "Condiments & Spices": [
+    { item: "Low-sodium soy sauce", qty: "1 bottle" },
+    { item: "Rice vinegar", qty: "1 bottle" },
+    { item: "Red wine vinegar", qty: "1 bottle" },
+    { item: "Sherry vinegar", qty: "small bottle" },
+    { item: "Smoked paprika", qty: "1 jar" },
+    { item: "Ground cumin", qty: "1 jar" },
+    { item: "Ground cardamom", qty: "1 jar" },
+    { item: "Chilli flakes", qty: "1 jar" },
+    { item: "Rosemary (fresh or dried)", qty: "" },
+    { item: "Thyme (fresh or dried)", qty: "" },
+    { item: "Fresh ginger", qty: "1 hand" },
+    { item: "Flat-leaf parsley", qty: "2 bunches" },
+    { item: "Maple syrup", qty: "1 bottle" },
+    { item: "Honey", qty: "1 jar" },
+    { item: "Vanilla extract", qty: "1 bottle" },
+    { item: "Baking powder", qty: "" }
+  ]
+};
+
+const mealLabel = { breakfast: "Breakfast", lunch: "Lunch", dinner: "Dinner" };
+let checkedItems = {};
+let dayOpenState = {};
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderHeader() {
+  const totalPlantPoints = Object.values(plantPointTotals).reduce((s,v)=>s+v,0);
+  let totalCals = 0;
+  days.forEach(d => { Object.values(d.meals).forEach(m => totalCals += m.calories); });
+  const avgCalories = Math.round(totalCals / 7);
+  document.getElementById('statCalories').textContent = avgCalories + ' kcal';
+  document.getElementById('statPlants').textContent = totalPlantPoints;
+}
+
+function plantPills(plants) {
+  return plants.map(p => `<span class="plant-pill">${escapeHtml(p)}</span>`).join('');
+}
+
+function renderDays() {
+  const container = document.getElementById('daysContainer');
+  container.innerHTML = days.map((d, dIdx) => {
+    const dayCalories = Object.values(d.meals).reduce((s,m) => s + m.calories, 0);
+    const plantPoints = plantPointTotals[d.short];
+    const totalProtein = Object.values(d.meals).reduce((s,m)=>s+m.protein,0);
+    const totalCarbs = Object.values(d.meals).reduce((s,m)=>s+m.carbs,0);
+    const totalFat = Object.values(d.meals).reduce((s,m)=>s+m.fat,0);
+    const totalFibre = Object.values(d.meals).reduce((s,m)=>s+m.fibre,0);
+    const allPlants = Object.values(d.meals).flatMap(m => m.plants);
+
+    const mealCards = ['breakfast','lunch','dinner'].map(mt => {
+      const meal = d.meals[mt];
+      if (!meal) return '';
+      return `
+        <button class="meal-card" onclick="openModal(${dIdx}, '${mt}')">
+          <span class="tag tag-${mt}">${mealLabel[mt]}</span>
+          <div class="meal-name">${escapeHtml(meal.name)}</div>
+          <div class="meal-meta">${meal.calories} kcal · ${meal.protein}g protein</div>
+          <div class="meal-plants">🌿 ${meal.plants.length} plants</div>
+          <div class="meal-cta">Tap for recipe →</div>
+        </button>`;
+    }).join('');
+
+    const defrostHtml = d.defrost ? `<div class="defrost">❄️ <strong>Defrost reminder:</strong> ${escapeHtml(d.defrost)}</div>` : '';
+
+    return `
+      <div class="card">
+        <button class="day-toggle" onclick="toggleDay(${dIdx})">
+          <div class="day-left">
+            <div class="day-badge">${d.short}</div>
+            <div>
+              <div class="day-name">${d.day}</div>
+              <div class="day-theme">${escapeHtml(d.theme)}</div>
+            </div>
+          </div>
+          <div class="day-right">
+            <div>
+              <div class="day-cals">${dayCalories} kcal</div>
+              <div class="day-pts">🌿 ${plantPoints} pts</div>
+            </div>
+            <span class="chevron" id="chevron-${dIdx}">⌄</span>
+          </div>
+        </button>
+        <div class="day-body" id="day-body-${dIdx}">
+          ${defrostHtml}
+          <div class="meal-grid">${mealCards}</div>
+          <div class="macro-shopping-grid">
+            <div class="macro-box">
+              ${macroRow('Protein', totalProtein, 80, 'var(--accent)')}
+              ${macroRow('Carbs', totalCarbs, 200, 'var(--warm)')}
+              ${macroRow('Fat', totalFat, 70, '#8B5CF6')}
+              ${macroRow('Fibre', totalFibre, 35, 'var(--green)')}
+            </div>
+            <div class="plants-box">
+              <div class="plants-box-title">Plants today</div>
+              ${plantPills(allPlants)}
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function macroRow(label, value, max, color) {
+  const pct = Math.min(100, (value/max)*100);
+  return `
+    <div class="macro-row">
+      <div class="macro-row-top"><span>${label}</span><span class="val">${value}g</span></div>
+      <div class="macro-track"><div class="macro-fill" style="width:${pct}%; background:${color};"></div></div>
+    </div>`;
+}
+
+function toggleDay(idx) {
+  dayOpenState[idx] = !dayOpenState[idx];
+  document.getElementById('day-body-' + idx).classList.toggle('open', dayOpenState[idx]);
+  document.getElementById('chevron-' + idx).classList.toggle('open', dayOpenState[idx]);
+}
+
+function openModal(dIdx, mealType) {
+  const meal = days[dIdx].meals[mealType];
+  const servings = SERVING_MAP[meal.servingKey];
+  const macros = [
+    { l: 'Calories', v: meal.calories, u: 'kcal' },
+    { l: 'Protein', v: meal.protein, u: 'g' },
+    { l: 'Carbs', v: meal.carbs, u: 'g' },
+    { l: 'Fat', v: meal.fat, u: 'g' }
+  ];
+  const html = `
+    <div class="modal-header">
+      <div>
+        <span class="tag tag-${mealType}">${mealLabel[mealType]}</span>
+        <div class="modal-title">${escapeHtml(meal.name)}</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-macros">
+      ${macros.map(m => `
+        <div class="modal-macro-box">
+          <div class="modal-macro-val">${m.v}</div>
+          <div class="modal-macro-unit">${m.u}</div>
+          <div class="modal-macro-lbl">${m.l}</div>
+        </div>`).join('')}
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">🌿 Plant Points</div>
+      <div>${plantPills(meal.plants)}</div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">🛒 Ingredients <span class="serving-note">(${servings} serving${servings > 1 ? 's' : ''})</span></div>
+      <ul class="modal-list">${meal.ingredients.map(i => `<li>${escapeHtml(i)}</li>`).join('')}</ul>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">👩‍🍳 Method</div>
+      <ol class="modal-list modal-method">${meal.method.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ol>
+    </div>
+    ${meal.notes ? `<div class="modal-notes">💡 ${escapeHtml(meal.notes)}</div>` : ''}
+    ${meal.tags ? `<div class="modal-tags">${meal.tags.map(t => `<span class="modal-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+  `;
+  document.getElementById('modalBox').innerHTML = html;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function closeModalOnOverlay(e) {
+  if (e.target.id === 'modalOverlay') closeModal();
+}
+
+function renderShoppingList() {
+  const body = document.getElementById('shopBody');
+  let html = '';
+  let total = 0;
+  Object.entries(shoppingList).forEach(([cat, items]) => {
+    html += `<div class="shop-cat"><div class="shop-cat-title">${escapeHtml(cat)}</div>`;
+    items.forEach((item, i) => {
+      const key = cat + '-' + i;
+      total++;
+      const done = checkedItems[key];
+      html += `
+        <div class="shop-item ${done ? 'done' : ''}" onclick="toggleShopItem('${key}')">
+          <div class="shop-checkbox ${done ? 'checked' : ''}"></div>
+          <div class="shop-item-name ${done ? 'done' : ''}">${escapeHtml(item.item)}</div>
+          ${item.qty ? `<div class="shop-item-qty">${escapeHtml(item.qty)}</div>` : ''}
+        </div>`;
+    });
+    html += `</div>`;
+  });
+  body.innerHTML = html;
+  updateShoppingProgress();
+}
+
+function toggleShopItem(key) {
+  checkedItems[key] = !checkedItems[key];
+  renderShoppingList();
+}
+
+function updateShoppingProgress() {
+  const allKeys = [];
+  Object.entries(shoppingList).forEach(([cat, items]) => {
+    items.forEach((_, i) => allKeys.push(cat + '-' + i));
+  });
+  const checkedCount = allKeys.filter(k => checkedItems[k]).length;
+  document.getElementById('shopCount').textContent = checkedCount + '/' + allKeys.length;
+  document.getElementById('shopBar').style.width = (checkedCount / allKeys.length * 100) + '%';
+}
+
+let shoppingOpen = false;
+function toggleShopping() {
+  shoppingOpen = !shoppingOpen;
+  document.getElementById('shopBody').classList.toggle('open', shoppingOpen);
+  document.getElementById('shopChevron').classList.toggle('open', shoppingOpen);
+}
+
+renderHeader();
+renderDays();
+renderShoppingList();
+</script>
+</body>
+</html>
