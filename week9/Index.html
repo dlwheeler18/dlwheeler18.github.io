@@ -1,1 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 9 Meal Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0F1A2E;
+    --surface: #1A2B45;
+    --surface2: #243755;
+    --border: #2E4A6A;
+    --text: #E8F0F8;
+    --text-muted: #7A9BBB;
+    --text-dim: #4A6A8A;
+    --accent: #4ECDC4;
+    --accent-dim: #1A3D3A;
+    --gold: #F7C948;
+    --gold-dim: #3A2E0A;
+    --rose: #E8706A;
+    --rose-dim: #3A1A18;
+    --green: #6BCB77;
+    --green-dim: #1A3A1E;
+  }
 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+    padding-bottom: 60px;
+  }
+
+  .header {
+    background: var(--surface);
+    padding: 32px 20px 28px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-week {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat {
+    flex: 1;
+    text-align: center;
+    padding: 14px 8px;
+    border-right: 1px solid var(--border);
+    max-width: 120px;
+  }
+  .stat:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+  .stat-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .tab-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    padding: 14px 16px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-day { font-size: 10px; display: block; color: var(--text-dim); margin-top: 1px; }
+  .tab.active .tab-day { color: var(--accent); opacity: 0.7; }
+
+  .section { display: none; padding: 20px 16px; max-width: 650px; margin: 0 auto; }
+  .section.active { display: block; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 4px; color: var(--text); }
+  .section-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
+
+  .meal-card {
+    background: var(--surface);
+    border-radius: 12px;
+    margin-bottom: 18px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .meal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .meal-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .icon-breakfast { background: var(--gold-dim); }
+  .icon-lunch { background: var(--green-dim); }
+  .icon-dinner { background: var(--rose-dim); }
+
+  .meal-info { flex: 1; }
+  .meal-type { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+  .meal-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; line-height: 1.2; color: var(--text); margin: 2px 0; }
+  
+  .meal-servings {
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--accent);
+    white-space: nowrap;
+    display: inline-block;
+    margin-top: 4px;
+  }
+
+  .meal-section {
+    padding: 16px;
+    border-bottom: 1px solid var(--surface2);
+  }
+  .meal-section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .ingredients-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .ingredient-item {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    padding: 4px 0;
+  }
+
+  .ingredient-item strong {
+    color: var(--text);
+  }
+
+  .instructions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .instruction-step {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    padding-left: 18px;
+    position: relative;
+  }
+
+  .instruction-step::before {
+    content: attr(data-step);
+    position: absolute;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+
+  .tag-ferment { background: var(--accent-dim); color: var(--accent); }
+  .tag-cuisine { background: var(--rose-dim); color: var(--rose); }
+  .tag-protein { background: var(--gold-dim); color: var(--gold); }
+
+  .kcal-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--surface2);
+    font-size: 13px;
+  }
+
+  .kcal-label { color: var(--text-dim); font-weight: 500; }
+  .kcal-num { color: var(--gold); font-weight: 600; }
+
+  .day-total {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+  }
+
+  .day-total-label { font-size: 13px; color: var(--text-muted); }
+  .day-total-kcal { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--gold); }
+
+  .prep-card {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .prep-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .prep-item {
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 3px 0;
+  }
+
+  .absent-card {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 28px 20px;
+    text-align: center;
+    border: 1px dashed var(--border);
+    margin-bottom: 14px;
+  }
+
+  .absent-icon { font-size: 32px; margin-bottom: 10px; }
+  .absent-title { font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 6px; color: var(--text-muted); }
+  .absent-sub { font-size: 13px; color: var(--text-dim); }
+
+  /* SHOPPING */
+  .shop-section { margin-bottom: 20px; }
+  .shop-category {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 10px 0 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .shop-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--surface2);
+    cursor: pointer;
+  }
+
+  .shop-item:last-child { border-bottom: none; }
+
+  .shop-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .shop-item.checked .shop-check { background: var(--green); border-color: var(--green); }
+  .shop-item.checked .shop-check::after { content: '✓'; color: var(--bg); font-size: 13px; font-weight: 700; }
+  .shop-item.checked .shop-name { text-decoration: line-through; color: var(--text-dim); }
+  .shop-item.checked .shop-qty { color: var(--text-dim); opacity: 0.5; }
+
+  .shop-text { flex: 1; }
+  .shop-name { display: block; font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.3; margin-bottom: 3px; }
+  .shop-qty { display: block; font-size: 12px; font-weight: 400; color: var(--text-muted); line-height: 1.5; }
+
+  /* OVERVIEW */
+  .overview-card {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 14px;
+  }
+
+  .overview-title { font-family: 'Playfair Display', serif; font-size: 16px; margin-bottom: 12px; color: var(--text); }
+  .overview-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 13px;
+    border-bottom: 1px solid var(--surface2);
+  }
+
+  .overview-row:last-child { border-bottom: none; }
+  .overview-key { color: var(--text-muted); }
+  .overview-val { font-weight: 600; color: var(--text); text-align: right; padding-left: 12px; }
+
+  .plants-card {
+    background: var(--green-dim);
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid rgba(107,203,119,0.2);
+    margin-bottom: 14px;
+  }
+
+  .plants-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .plants-title { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--text); }
+  .plants-count { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--green); }
+  .plants-target { font-size: 11px; color: var(--text-muted); }
+  .plant-list { display: flex; flex-wrap: wrap; gap: 5px; }
+  .plant-tag { font-size: 11px; background: rgba(107,203,119,0.12); color: var(--green); padding: 3px 8px; border-radius: 20px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-week">Meal Plan · Week 9</div>
+  <div class="header-title">Varied & Vibrant</div>
+  <div class="header-sub">30+ plants · zero UPF · ~1,662 kcal/day</div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num">35</div><div class="stat-label">Plant pts</div></div>
+  <div class="stat"><div class="stat-num">5</div><div class="stat-label">Ferments</div></div>
+  <div class="stat"><div class="stat-num">6</div><div class="stat-label">Cuisines</div></div>
+  <div class="stat"><div class="stat-num">0</div><div class="stat-label">UPF</div></div>
+</div>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="showTab('monday',this)">Mon<span class="tab-day">×2</span></div>
+  <div class="tab" onclick="showTab('tuesday',this)">Tue<span class="tab-day">×1</span></div>
+  <div class="tab" onclick="showTab('wednesday',this)">Wed<span class="tab-day">×1</span></div>
+  <div class="tab" onclick="showTab('thursday',this)">Thu<span class="tab-day">×1</span></div>
+  <div class="tab" onclick="showTab('friday',this)">Fri<span class="tab-day">B+L</span></div>
+  <div class="tab" onclick="showTab('weekend',this)">Wknd<span class="tab-day">Away</span></div>
+  <div class="tab" onclick="showTab('shopping',this)">🛒 Shop</div>
+  <div class="tab" onclick="showTab('overview',this)">Overview</div>
+</div>
+
+<!-- MONDAY -->
+<div id="monday" class="section active">
+  <div class="section-title">Monday</div>
+  <div class="section-sub">All meals for 2 · prep overnight oats tonight</div>
+
+  <div class="prep-card">
+    <div class="prep-title">🌙 Tonight's Prep</div>
+    <div class="prep-item">Make Mon overnight oats ×2 — 80g oats total</div>
+  </div>
+
+  <!-- Breakfast -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-breakfast">🌾</div>
+      <div class="meal-info">
+        <div class="meal-type">Breakfast</div>
+        <div class="meal-name">Raspberry & Almond Oats</div>
+        <div class="meal-servings">×2</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients (per serving: 40g oats)</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>40g</strong> rolled oats</div>
+        <div class="ingredient-item"><strong>125ml</strong> Plenish oat milk</div>
+        <div class="ingredient-item"><strong>½ tbsp</strong> ground flaxseed</div>
+        <div class="ingredient-item"><strong>Handful</strong> raspberries (fresh or frozen)</div>
+        <div class="ingredient-item"><strong>Small handful</strong> sliced almonds</div>
+        <div class="ingredient-item"><strong>Drizzle</strong> honey</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-ferment">🫙 Kefir on side</span>
+        <span class="tag tag-protein">Oats · Almonds</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">Measure 40g oats into a bowl. Add 125ml Plenish oat milk and ½ tbsp ground flaxseed.</div>
+        <div class="instruction-step" data-step="2">Cover and refrigerate overnight, or for at least 4 hours.</div>
+        <div class="instruction-step" data-step="3">Top with a handful of raspberries and sliced almonds. Drizzle with honey.</div>
+        <div class="instruction-step" data-step="4">Serve with a small pot of kefir on the side.</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~370 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lunch -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-lunch">🥗</div>
+      <div class="meal-info">
+        <div class="meal-type">Lunch</div>
+        <div class="meal-name">Lentil & Roasted Vegetable Salad</div>
+        <div class="meal-servings">×2</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>100g</strong> green lentils (dried, or use cooked)</div>
+        <div class="ingredient-item"><strong>1 small handful</strong> roasted carrots, diced</div>
+        <div class="ingredient-item"><strong>1 small handful</strong> roasted beets, diced</div>
+        <div class="ingredient-item"><strong>¼</strong> red onion, thinly sliced</div>
+        <div class="ingredient-item"><strong>Generous handful</strong> fresh parsley, chopped</div>
+        <div class="ingredient-item"><strong>3 tbsp</strong> olive oil</div>
+        <div class="ingredient-item"><strong>1 tbsp</strong> lemon juice</div>
+        <div class="ingredient-item"><strong>Salt & pepper</strong> to taste</div>
+        <div class="ingredient-item"><strong>2 slices</strong> sourdough bread</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-cuisine">🌍 Mediterranean</span>
+        <span class="tag tag-protein">Green lentils</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">If making fresh: cook 100g green lentils in salted water for 20–25 min until tender. Drain and cool.</div>
+        <div class="instruction-step" data-step="2">Combine lentils, roasted carrots, beets, red onion, and parsley in a bowl.</div>
+        <div class="instruction-step" data-step="3">Dress with olive oil, lemon juice, salt, and pepper. Toss well.</div>
+        <div class="instruction-step" data-step="4">Divide between 2 bowls. Serve each with a slice of sourdough.</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~390 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dinner -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-dinner">🍽️</div>
+      <div class="meal-info">
+        <div class="meal-type">Dinner</div>
+        <div class="meal-name">Vietnamese-style Lentil Bowl</div>
+        <div class="meal-servings">×2</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>150g</strong> brown rice (dry)</div>
+        <div class="ingredient-item"><strong>100g</strong> brown lentils (dry)</div>
+        <div class="ingredient-item"><strong>1 tbsp</strong> sesame oil</div>
+        <div class="ingredient-item"><strong>Juice of 1</strong> lime</div>
+        <div class="ingredient-item"><strong>Handful</strong> fresh basil</div>
+        <div class="ingredient-item"><strong>Handful</strong> fresh mint</div>
+        <div class="ingredient-item"><strong>½</strong> cucumber, thinly sliced</div>
+        <div class="ingredient-item"><strong>2 small handfuls</strong> pickled or grated carrots</div>
+        <div class="ingredient-item"><strong>2</strong> spring onions, sliced</div>
+        <div class="ingredient-item"><strong>Salt</strong> to taste</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-cuisine">🇻🇳 Vietnamese-inspired</span>
+        <span class="tag tag-protein">Brown rice · Lentils</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">Cook 150g brown rice and 100g brown lentils separately according to packet until tender. Drain both.</div>
+        <div class="instruction-step" data-step="2">Combine rice and lentils in a bowl. Add sesame oil, lime juice, and a pinch of salt.</div>
+        <div class="instruction-step" data-step="3">Top with fresh basil, mint, cucumber slices, pickled carrots, and spring onion.</div>
+        <div class="instruction-step" data-step="4">Serve warm or at room temperature. Divide between 2 bowls. Drizzle with extra sesame oil if desired.</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~470 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="day-total">
+    <div><div class="day-total-label">Day total (per person)</div></div>
+    <div class="day-total-kcal">~1,230 kcal</div>
+  </div>
+</div>
+
+<!-- TUESDAY -->
+<div id="tuesday" class="section">
+  <div class="section-title">Tuesday</div>
+  <div class="section-sub">All meals for 1 · prep Wednesday's oats tonight</div>
+
+  <div class="prep-card">
+    <div class="prep-title">🌙 Tonight's Prep</div>
+    <div class="prep-item">Make Wed overnight oats ×1 — 50g oats</div>
+  </div>
+
+  <!-- Breakfast -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-breakfast">🌾</div>
+      <div class="meal-info">
+        <div class="meal-type">Breakfast</div>
+        <div class="meal-name">Banana & Peanut Butter Oats</div>
+        <div class="meal-servings">×1</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>50g</strong> rolled oats</div>
+        <div class="ingredient-item"><strong>250ml</strong> Plenish oat milk</div>
+        <div class="ingredient-item"><strong>1 tbsp</strong> natural peanut butter</div>
+        <div class="ingredient-item"><strong>1</strong> banana, sliced</div>
+        <div class="ingredient-item"><strong>Drizzle</strong> honey</div>
+        <div class="ingredient-item"><strong>Spoonful</strong> live yoghurt</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-ferment">🫙 Live yoghurt</span>
+        <span class="tag tag-protein">Oats · Peanut butter</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">Measure 50g oats into a bowl. Add 250ml Plenish oat milk and 1 tbsp natural peanut butter.</div>
+        <div class="instruction-step" data-step="2">Stir well (or leave peanut butter to swirl through). Cover and refrigerate overnight.</div>
+        <div class="instruction-step" data-step="3">Top with sliced banana and a drizzle of honey in the morning.</div>
+        <div class="instruction-step" data-step="4">Add a spoonful of live yoghurt on the side or stirred in.</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~380 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lunch -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-lunch">🥗</div>
+      <div class="meal-info">
+        <div class="meal-type">Lunch</div>
+        <div class="meal-name">Egg Salad with Sourdough</div>
+        <div class="meal-servings">×1</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>2</strong> eggs</div>
+        <div class="ingredient-item"><strong>Handful</strong> mixed salad leaves</div>
+        <div class="ingredient-item"><strong>Handful</strong> cherry tomatoes, halved</div>
+        <div class="ingredient-item"><strong>¼</strong> cucumber, sliced</div>
+        <div class="ingredient-item"><strong>2 tbsp</strong> live yoghurt</div>
+        <div class="ingredient-item"><strong>½ tsp</strong> Dijon mustard</div>
+        <div class="ingredient-item"><strong>Squeeze</strong> lemon juice</div>
+        <div class="ingredient-item"><strong>Salt & pepper</strong> to taste</div>
+        <div class="ingredient-item"><strong>1 slice</strong> sourdough bread</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-cuisine">🌍 Classic</span>
+        <span class="tag tag-protein">Eggs</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">Hard-boil 2 eggs: place in cold water, bring to boil, remove from heat, let sit 10 min. Cool and peel.</div>
+        <div class="instruction-step" data-step="2">Make dressing: mix 2 tbsp live yoghurt, ½ tsp Dijon mustard, squeeze of lemon, salt, and pepper.</div>
+        <div class="instruction-step" data-step="3">Halve eggs. Arrange on mixed leaves with cherry tomatoes and cucumber.</div>
+        <div class="instruction-step" data-step="4">Drizzle dressing over everything. Serve with warm sourdough.</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~400 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dinner -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-dinner">🍽️</div>
+      <div class="meal-info">
+        <div class="meal-type">Dinner</div>
+        <div class="meal-name">Frittata with Roasted Peppers & Herbs</div>
+        <div class="meal-servings">×1</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>1 tbsp</strong> olive oil</div>
+        <div class="ingredient-item"><strong>1</strong> onion, sliced</div>
+        <div class="ingredient-item"><strong>Handful</strong> spinach</div>
+        <div class="ingredient-item"><strong>½</strong> jarred roasted red pepper, chopped</div>
+        <div class="ingredient-item"><strong>3</strong> eggs</div>
+        <div class="ingredient-item"><strong>2 tbsp</strong> live yoghurt</div>
+        <div class="ingredient-item"><strong>Few leaves</strong> fresh basil, torn</div>
+        <div class="ingredient-item"><strong>Salt & pepper</strong> to taste</div>
+        <div class="ingredient-item"><strong>Handful</strong> mixed salad leaves</div>
+        <div class="ingredient-item"><strong>1 slice</strong> sourdough bread</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-cuisine">🇮🇹 Italian</span>
+        <span class="tag tag-protein">Eggs</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">Heat olive oil in ovenproof frying pan. Soften 1 sliced onion over medium heat for 10 min.</div>
+        <div class="instruction-step" data-step="2">Add a handful of spinach and cook until wilted. Add ½ roasted red pepper.</div>
+        <div class="instruction-step" data-step="3">Whisk 3 eggs with 2 tbsp live yoghurt, torn basil, salt, and pepper. Pour over vegetables.</div>
+        <div class="instruction-step" data-step="4">Cook on stovetop 2–3 min until edges set. Transfer to oven at 180°C for 8–10 min until centre set and top golden.</div>
+        <div class="instruction-step" data-step="5">Slide onto plate. Serve with green salad and sourdough.</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~450 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="day-total">
+    <div><div class="day-total-label">Day total</div></div>
+    <div class="day-total-kcal">~1,230 kcal</div>
+  </div>
+</div>
+
+<!-- WEDNESDAY -->
+<div id="wednesday" class="section">
+  <div class="section-title">Wednesday</div>
+  <div class="section-sub">All meals for 1 · prep Thursday's oats tonight</div>
+
+  <div class="prep-card">
+    <div class="prep-title">🌙 Tonight's Prep</div>
+    <div class="prep-item">Make Thu overnight oats ×1 — 50g oats</div>
+  </div>
+
+  <!-- Breakfast -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-breakfast">🌾</div>
+      <div class="meal-info">
+        <div class="meal-type">Breakfast</div>
+        <div class="meal-name">Plum & Cardamom Oats</div>
+        <div class="meal-servings">×1</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>50g</strong> rolled oats</div>
+        <div class="ingredient-item"><strong>250ml</strong> Plenish oat milk</div>
+        <div class="ingredient-item"><strong>Small pinch</strong> ground cardamom</div>
+        <div class="ingredient-item"><strong>1–2</strong> plums, sliced (or thawed frozen)</div>
+        <div class="ingredient-item"><strong>Drizzle</strong> honey</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-protein">Oats · Cardamom</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">Measure 50g oats into a bowl. Add 250ml Plenish oat milk and a small pinch of ground cardamom.</div>
+        <div class="instruction-step" data-step="2">Cover and refrigerate overnight.</div>
+        <div class="instruction-step" data-step="3">In the morning, slice fresh plums (or thaw frozen) and arrange on top.</div>
+        <div class="instruction-step" data-step="4">Drizzle with honey. Eat cold or gently warm in microwave.</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~350 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lunch -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-lunch">🥗</div>
+      <div class="meal-info">
+        <div class="meal-type">Lunch</div>
+        <div class="meal-name">Chickpea & Herb Salad</div>
+        <div class="meal-servings">×1</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>1 tin</strong> chickpeas (400g)</div>
+        <div class="ingredient-item"><strong>1 tsp</strong> olive oil</div>
+        <div class="ingredient-item"><strong>½ tsp</strong> smoked paprika</div>
+        <div class="ingredient-item"><strong>Handful</strong> cherry tomatoes, halved</div>
+        <div class="ingredient-item"><strong>¼</strong> cucumber, diced</div>
+        <div class="ingredient-item"><strong>Thin slices</strong> red onion</div>
+        <div class="ingredient-item"><strong>Handful</strong> fresh parsley</div>
+        <div class="ingredient-item"><strong>Handful</strong> fresh mint</div>
+        <div class="ingredient-item"><strong>1 tbsp</strong> tahini</div>
+        <div class="ingredient-item"><strong>1 tbsp</strong> lemon juice</div>
+        <div class="ingredient-item"><strong>1 tbsp</strong> water</div>
+        <div class="ingredient-item"><strong>Salt & pepper</strong> to taste</div>
+        <div class="ingredient-item"><strong>1 slice</strong> sourdough bread</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-cuisine">🌍 Middle Eastern</span>
+        <span class="tag tag-protein">Chickpeas</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">Drain and rinse 1 tin chickpeas. Pat dry. Toss with 1 tsp olive oil, ½ tsp smoked paprika, salt, pepper.</div>
+        <div class="instruction-step" data-step="2">Roast at 200°C for 20 min, shaking halfway, until golden and crispy.</div>
+        <div class="instruction-step" data-step="3">Combine roasted chickpeas, cherry tomatoes, cucumber, red onion, parsley, and mint.</div>
+        <div class="instruction-step" data-step="4">Make dressing: whisk tahini, lemon juice, water, salt, pepper. Toss with salad. Serve with sourdough.</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~410 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dinner -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-dinner">🍽️</div>
+      <div class="meal-info">
+        <div class="meal-type">Dinner</div>
+        <div class="meal-name">Chicken with Green Sauce & New Potatoes</div>
+        <div class="meal-servings">×1</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>250g</strong> new potatoes</div>
+        <div class="ingredient-item"><strong>Large handful</strong> fresh basil</div>
+        <div class="ingredient-item"><strong>Handful</strong> fresh parsley</div>
+        <div class="ingredient-item"><strong>1</strong> garlic clove</div>
+        <div class="ingredient-item"><strong>3 tbsp</strong> olive oil</div>
+        <div class="ingredient-item"><strong>1 tbsp</strong> lemon juice</div>
+        <div class="ingredient-item"><strong>Salt & pepper</strong> to taste</div>
+        <div class="ingredient-item"><strong>1</strong> chicken breast</div>
+        <div class="ingredient-item"><strong>Handful</strong> mixed salad leaves</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-cuisine">🇮🇹 Italian-inspired</span>
+        <span class="tag tag-protein">Chicken breast</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">Boil 250g new potatoes in salted water for 15 min until tender. Drain.</div>
+        <div class="instruction-step" data-step="2">Make green sauce: blend large handful basil, handful parsley, 1 garlic clove, 3 tbsp olive oil, 1 tbsp lemon juice, salt, pepper.</div>
+        <div class="instruction-step" data-step="3">Season 1 chicken breast with salt and pepper. Pan-fry in a little oil for 6–7 min each side until cooked.</div>
+        <div class="instruction-step" data-step="4">Slice chicken and drizzle green sauce over. Serve with boiled potatoes and a small salad dressed with lemon oil.</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~480 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="day-total">
+    <div><div class="day-total-label">Day total</div></div>
+    <div class="day-total-kcal">~1,240 kcal</div>
+  </div>
+</div>
+
+<!-- THURSDAY -->
+<div id="thursday" class="section">
+  <div class="section-title">Thursday</div>
+  <div class="section-sub">All meals for 1 · prep Friday's oats tonight</div>
+
+  <div class="prep-card">
+    <div class="prep-title">🌙 Tonight's Prep</div>
+    <div class="prep-item">Make Fri overnight oats ×1 — 50g oats</div>
+  </div>
+
+  <!-- Breakfast -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-breakfast">🌾</div>
+      <div class="meal-info">
+        <div class="meal-type">Breakfast</div>
+        <div class="meal-name">Blueberry & Lemon Oats</div>
+        <div class="meal-servings">×1</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>50g</strong> rolled oats</div>
+        <div class="ingredient-item"><strong>250ml</strong> Plenish oat milk</div>
+        <div class="ingredient-item"><strong>Squeeze</strong> fresh lemon juice</div>
+        <div class="ingredient-item"><strong>Handful</strong> blueberries (fresh or frozen)</div>
+        <div class="ingredient-item"><strong>Drizzle</strong> honey</div>
+        <div class="ingredient-item"><strong>Tiny pinch</strong> lemon zest (optional)</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-protein">Oats · Lemon</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">Measure 50g oats into a bowl. Add 250ml Plenish oat milk and a squeeze of fresh lemon juice.</div>
+        <div class="instruction-step" data-step="2">Cover and refrigerate overnight.</div>
+        <div class="instruction-step" data-step="3">Top with blueberries and a drizzle of honey in the morning.</div>
+        <div class="instruction-step" data-step="4">Add a tiny pinch of lemon zest for extra brightness if you like.</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~330 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lunch -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-lunch">🥗</div>
+      <div class="meal-info">
+        <div class="meal-type">Lunch</div>
+        <div class="meal-name">Black Bean & Lime Salad</div>
+        <div class="meal-servings">×1</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>1 tin</strong> black beans (400g)</div>
+        <div class="ingredient-item"><strong>1 tin</strong> sweetcorn (330g)</div>
+        <div class="ingredient-item"><strong>1</strong> red pepper, diced</div>
+        <div class="ingredient-item"><strong>Thin slices</strong> red onion</div>
+        <div class="ingredient-item"><strong>Handful</strong> fresh parsley, chopped</div>
+        <div class="ingredient-item"><strong>Juice of ½</strong> lime</div>
+        <div class="ingredient-item"><strong>2 tbsp</strong> olive oil</div>
+        <div class="ingredient-item"><strong>1 tsp</strong> ground cumin</div>
+        <div class="ingredient-item"><strong>Salt & pepper</strong> to taste</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-cuisine">🇲🇽 Mexican-inspired</span>
+        <span class="tag tag-protein">Black beans</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">Drain and rinse 1 tin black beans. Drain 1 tin sweetcorn.</div>
+        <div class="instruction-step" data-step="2">Combine black beans, sweetcorn, diced red pepper, red onion, and parsley in a bowl.</div>
+        <div class="instruction-step" data-step="3">Make dressing: squeeze ½ lime juice, mix with 2 tbsp olive oil, 1 tsp cumin, salt, pepper.</div>
+        <div class="instruction-step" data-step="4">Toss everything together. Serve at room temperature or chill.</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~400 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dinner -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-dinner">🍽️</div>
+      <div class="meal-info">
+        <div class="meal-type">Dinner</div>
+        <div class="meal-name">Black Bean & Sweet Potato Lettuce Wraps</div>
+        <div class="meal-servings">×1</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>250g</strong> sweet potato, cubed</div>
+        <div class="ingredient-item"><strong>1 tsp</strong> olive oil</div>
+        <div class="ingredient-item"><strong>½ tsp</strong> ground cumin</div>
+        <div class="ingredient-item"><strong>½ tsp</strong> smoked paprika</div>
+        <div class="ingredient-item"><strong>Salt & pepper</strong> to taste</div>
+        <div class="ingredient-item"><strong>1 tin</strong> black beans (400g)</div>
+        <div class="ingredient-item"><strong>¼</strong> avocado</div>
+        <div class="ingredient-item"><strong>3 tbsp</strong> live yoghurt</div>
+        <div class="ingredient-item"><strong>Juice of ½</strong> lime</div>
+        <div class="ingredient-item"><strong>Crisp lettuce leaves</strong> for wrapping</div>
+        <div class="ingredient-item"><strong>Handful</strong> fresh parsley</div>
+        <div class="ingredient-item"><strong>Slices</strong> fresh avocado</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-cuisine">🇲🇽 Mexican-inspired</span>
+        <span class="tag tag-protein">Black beans · Sweet potato</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">Cut 250g sweet potato into small cubes. Toss with 1 tsp oil, ½ tsp cumin, ½ tsp smoked paprika, salt, pepper.</div>
+        <div class="instruction-step" data-step="2">Roast at 200°C for 20 min until tender and caramelised.</div>
+        <div class="instruction-step" data-step="3">Drain and rinse 1 tin black beans. Add to pan with roasted sweet potato, warm through. Season to taste.</div>
+        <div class="instruction-step" data-step="4">Make lime crema: blend ¼ avocado with 3 tbsp live yoghurt, juice of ½ lime, salt, pepper until smooth.</div>
+        <div class="instruction-step" data-step="5">Arrange crisp lettuce leaves on plate. Fill each with warm bean-potato mix, top with lime crema, avocado slices, and parsley.</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~490 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="day-total">
+    <div><div class="day-total-label">Day total</div></div>
+    <div class="day-total-kcal">~1,220 kcal</div>
+  </div>
+</div>
+
+<!-- FRIDAY -->
+<div id="friday" class="section">
+  <div class="section-title">Friday</div>
+  <div class="section-sub">Breakfast & lunch for 1 only · away from dinner</div>
+
+  <!-- Breakfast -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-breakfast">🌾</div>
+      <div class="meal-info">
+        <div class="meal-type">Breakfast</div>
+        <div class="meal-name">Coconut & Mango Oats</div>
+        <div class="meal-servings">×1</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>50g</strong> rolled oats</div>
+        <div class="ingredient-item"><strong>250ml</strong> Plenish oat milk</div>
+        <div class="ingredient-item"><strong>1 tbsp</strong> shredded coconut (unsweetened)</div>
+        <div class="ingredient-item"><strong>Handful</strong> mango chunks (fresh or frozen)</div>
+        <div class="ingredient-item"><strong>Drizzle</strong> honey</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-protein">Oats · Coconut</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">Measure 50g oats into a bowl. Add 250ml Plenish oat milk and 1 tbsp shredded coconut.</div>
+        <div class="instruction-step" data-step="2">Cover and refrigerate overnight.</div>
+        <div class="instruction-step" data-step="3">Top with mango chunks (fresh or thawed) and a drizzle of honey in the morning.</div>
+        <div class="instruction-step" data-step="4">Stir gently or enjoy layered. Tropical and nourishing!</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~370 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lunch -->
+  <div class="meal-card">
+    <div class="meal-header">
+      <div class="meal-icon icon-lunch">🥗</div>
+      <div class="meal-info">
+        <div class="meal-type">Lunch</div>
+        <div class="meal-name">Butter Bean & Tomato Salad</div>
+        <div class="meal-servings">×1</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Ingredients</span>
+      <div class="ingredients-list">
+        <div class="ingredient-item"><strong>1 tin</strong> butter beans (400g)</div>
+        <div class="ingredient-item"><strong>Handful</strong> cherry tomatoes, halved</div>
+        <div class="ingredient-item"><strong>Thin slices</strong> red onion</div>
+        <div class="ingredient-item"><strong>Handful</strong> fresh basil, torn</div>
+        <div class="ingredient-item"><strong>3 tbsp</strong> olive oil</div>
+        <div class="ingredient-item"><strong>1 tbsp</strong> lemon juice</div>
+        <div class="ingredient-item"><strong>Salt & pepper</strong> to taste</div>
+        <div class="ingredient-item"><strong>1 slice</strong> sourdough bread</div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-cuisine">🇮🇹 Italian</span>
+        <span class="tag tag-protein">Butter beans</span>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">How to Make It</span>
+      <div class="instructions-list">
+        <div class="instruction-step" data-step="1">Drain and rinse 1 tin butter beans. Transfer to a bowl.</div>
+        <div class="instruction-step" data-step="2">Add halved cherry tomatoes, sliced red onion, and torn fresh basil.</div>
+        <div class="instruction-step" data-step="3">Dress with 3 tbsp olive oil, 1 tbsp lemon juice, salt, pepper. Toss gently.</div>
+        <div class="instruction-step" data-step="4">Serve at room temperature or warm. Pair with sourdough for scooping up dressing.</div>
+      </div>
+    </div>
+
+    <div class="meal-section">
+      <span class="section-label">Nutrition</span>
+      <div class="kcal-bar">
+        <span class="kcal-label">Per serving:</span>
+        <span class="kcal-num">~410 kcal</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="absent-card">
+    <div class="absent-icon">✈️</div>
+    <div class="absent-title">Away this evening</div>
+    <div class="absent-sub">No dinner needed · enjoy your weekend!</div>
+  </div>
+</div>
+
+<!-- WEEKEND -->
+<div id="weekend" class="section">
+  <div class="absent-card" style="margin-top:20px">
+    <div class="absent-icon">🌍</div>
+    <div class="absent-title">Away all weekend</div>
+    <div class="absent-sub">Friday dinner → Sunday dinner: no meals needed</div>
+  </div>
+</div>
+
+<!-- SHOPPING -->
+<div id="shopping" class="section">
+  <div class="section-title">Shopping List</div>
+  <div class="section-sub">Week 9 · tap items to check off</div>
+
+  <div class="shop-section">
+    <div class="shop-category">🥚 Eggs & Dairy</div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Eggs (free-range)</span>
+        <span class="shop-qty">8 — Tue breakfast (1), Tue lunch (2), Tue dinner (3), spare</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Kefir</span>
+        <span class="shop-qty">1 small pot (150–200ml) — Mon breakfast (×2)</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Live natural yoghurt</span>
+        <span class="shop-qty">500g pot — Tue breakfast, Tue lunch, Tue dinner, Wed/Thu dressings, Thu dinner</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Plenish oat milk</span>
+        <span class="shop-qty">2 × 1 litre cartons — overnight oats Mon–Fri</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="shop-section">
+    <div class="shop-category">🥩 Meat</div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Chicken breasts (free-range)</span>
+        <span class="shop-qty">2 — Wed dinner (1), spare or freeze</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="shop-section">
+    <div class="shop-category">🌾 Grains & Pulses</div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Rolled oats</span>
+        <span class="shop-qty">500g bag — Mon 80g (×2), Tue–Fri 50g each = 360g total</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Green lentils (dried)</span>
+        <span class="shop-qty">200g bag — Mon lunch (100g)</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Brown lentils (dried)</span>
+        <span class="shop-qty">200g bag — Mon dinner (100g)</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Brown rice (dried)</span>
+        <span class="shop-qty">500g bag — Mon dinner (150g)</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Chickpeas (tinned)</span>
+        <span class="shop-qty">1 × 400g tin — Wed lunch</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Black beans (tinned)</span>
+        <span class="shop-qty">2 × 400g tins — Thu lunch, Thu dinner</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Butter beans (tinned)</span>
+        <span class="shop-qty">1 × 400g tin — Fri lunch</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Sweetcorn (tinned)</span>
+        <span class="shop-qty">1 × 330g tin — Thu lunch</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="shop-section">
+    <div class="shop-category">🥬 Fresh Veg</div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Spinach (fresh)</span>
+        <span class="shop-qty">1 bag (150g) — Tue dinner frittata</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Mixed salad leaves</span>
+        <span class="shop-qty">1 bag — Tue lunch, Wed dinner</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Rocket</span>
+        <span class="shop-qty">1 bag (60g) — Wed dinner salad</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Red peppers</span>
+        <span class="shop-qty">2 — Tue dinner, Wed lunch</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Roasted red peppers (jarred)</span>
+        <span class="shop-qty">1 large jar — Mon lunch, Tue dinner</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Onions</span>
+        <span class="shop-qty">3 — Mon lunch, Tue dinner, Thu dinner</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Red onions</span>
+        <span class="shop-qty">3 — Mon lunch, Thu lunch, Fri lunch</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Cherry tomatoes</span>
+        <span class="shop-qty">2 punnets (250g each) — Tue lunch, Wed lunch, Fri lunch</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Cucumber</span>
+        <span class="shop-qty">1 — Tue lunch, Wed lunch, Thu lunch</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Sweet potatoes</span>
+        <span class="shop-qty">2 medium — Thu dinner roasted</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">New potatoes</span>
+        <span class="shop-qty">500g bag — Wed dinner</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Carrots (roasted or fresh)</span>
+        <span class="shop-qty">2 medium — Mon lunch, Mon dinner (pickled or grated)</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Beets (roasted or fresh)</span>
+        <span class="shop-qty">2 small — Mon lunch (roasted)</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Lettuce (crisp heads)</span>
+        <span class="shop-qty">1 head or bag — Thu dinner wraps</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Avocados</span>
+        <span class="shop-qty">2 — Wed lunch, Thu dinner (½ + slices), Fri lunch</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Spring onions</span>
+        <span class="shop-qty">1 bunch — Mon dinner garnish</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Garlic</span>
+        <span class="shop-qty">1 bulb — multiple dishes</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="shop-section">
+    <div class="shop-category">🍎 Fresh Fruit</div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Raspberries</span>
+        <span class="shop-qty">1 punnet or bag — Mon breakfast</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Banana</span>
+        <span class="shop-qty">1 — Tue breakfast</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Plums</span>
+        <span class="shop-qty">2–3 fresh or 1 bag frozen — Wed breakfast</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Blueberries</span>
+        <span class="shop-qty">1 punnet or bag — Thu breakfast</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Mango</span>
+        <span class="shop-qty">1 fresh or 1 bag frozen chunks — Fri breakfast</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Lemons</span>
+        <span class="shop-qty">3 — multiple dressings, sauce</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Limes</span>
+        <span class="shop-qty">2 — Thu lunch, Thu dinner, Mon dinner</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="shop-section">
+    <div class="shop-category">🌿 Herbs & Extras</div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Fresh basil</span>
+        <span class="shop-qty">1 small bunch — Tue dinner, Wed dinner, Fri lunch</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Fresh parsley</span>
+        <span class="shop-qty">1 small bunch — Mon lunch, Wed lunch, Thu lunch</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Fresh mint</span>
+        <span class="shop-qty">1 small bunch — Mon dinner, Wed lunch</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Ground flaxseed</span>
+        <span class="shop-qty">1 bag — Mon breakfast (½ tbsp per serving)</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Sliced almonds</span>
+        <span class="shop-qty">50g — Mon breakfast</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Natural peanut butter</span>
+        <span class="shop-qty">1 small jar — Tue breakfast</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Tahini</span>
+        <span class="shop-qty">1 small jar — Wed lunch dressing</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Shredded coconut (unsweetened)</span>
+        <span class="shop-qty">1 bag — Fri breakfast</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Sourdough loaf</span>
+        <span class="shop-qty">1–2 loaves — throughout week</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="shop-section">
+    <div class="shop-category">🌿 Spices & Condiments (check stocks)</div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Smoked paprika</span>
+        <span class="shop-qty">Check stocks — Wed lunch, Thu dinner</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Ground cumin</span>
+        <span class="shop-qty">Check stocks — Wed lunch, Thu lunch, Thu dinner</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Ground cardamom</span>
+        <span class="shop-qty">Check stocks — Mon breakfast, Wed breakfast</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Dijon mustard</span>
+        <span class="shop-qty">Check stocks — Tue lunch dressing</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Sesame oil</span>
+        <span class="shop-qty">Check stocks — Mon dinner</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Extra-virgin olive oil</span>
+        <span class="shop-qty">Check stocks — dressings throughout</span>
+      </div>
+    </div>
+    <div class="shop-item" onclick="toggleCheck(this)">
+      <div class="shop-check"></div>
+      <div class="shop-text">
+        <span class="shop-name">Raw honey</span>
+        <span class="shop-qty">Check stocks — oat toppings</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERVIEW -->
+<div id="overview" class="section">
+  <div class="section-title">Week 9 Overview</div>
+  <div class="section-sub">Plants, ferments & nutrition at a glance</div>
+
+  <div class="plants-card">
+    <div class="plants-header">
+      <div>
+        <div class="plants-title">🌿 Plant Points</div>
+        <div class="plants-target">Target: 30+ per week</div>
+      </div>
+      <div class="plants-count">35</div>
+    </div>
+    <div class="plant-list">
+      <span class="plant-tag">Oats</span><span class="plant-tag">Flaxseed</span><span class="plant-tag">Almonds</span><span class="plant-tag">Peanut butter</span><span class="plant-tag">Tahini</span><span class="plant-tag">Coconut</span><span class="plant-tag">Raspberry</span><span class="plant-tag">Banana</span><span class="plant-tag">Plum</span><span class="plant-tag">Blueberry</span><span class="plant-tag">Mango</span><span class="plant-tag">Green lentils</span><span class="plant-tag">Brown lentils</span><span class="plant-tag">Brown rice</span><span class="plant-tag">Chickpeas</span><span class="plant-tag">Black beans</span><span class="plant-tag">Butter beans</span><span class="plant-tag">Spinach</span><span class="plant-tag">Rocket</span><span class="plant-tag">Basil</span><span class="plant-tag">Parsley</span><span class="plant-tag">Mint</span><span class="plant-tag">Pepper</span><span class="plant-tag">Carrot</span><span class="plant-tag">Beet</span><span class="plant-tag">Sweet potato</span><span class="plant-tag">Tomato</span><span class="plant-tag">Cucumber</span><span class="plant-tag">Avocado</span><span class="plant-tag">Lemon</span><span class="plant-tag">Lime</span><span class="plant-tag">Garlic</span><span class="plant-tag">Onion</span><span class="plant-tag">Cumin</span>
+    </div>
+  </div>
+
+  <div class="overview-card">
+    <div class="overview-title">🫙 Fermented Foods</div>
+    <div class="overview-row"><span class="overview-key">Monday</span><span class="overview-val">Kefir</span></div>
+    <div class="overview-row"><span class="overview-key">Tuesday</span><span class="overview-val">Live yoghurt (×3 in meals)</span></div>
+    <div class="overview-row"><span class="overview-key">Wednesday</span><span class="overview-val">Live yoghurt</span></div>
+    <div class="overview-row"><span class="overview-key">Thursday</span><span class="overview-val">Live yoghurt (dinner crema)</span></div>
+    <div class="overview-row"><span class="overview-key">Friday</span><span class="overview-val">—</span></div>
+  </div>
+
+  <div class="overview-card">
+    <div class="overview-title">🍽️ Cuisine Spread</div>
+    <div class="overview-row"><span class="overview-key">Vietnamese</span><span class="overview-val">Mon dinner</span></div>
+    <div class="overview-row"><span class="overview-key">Mediterranean</span><span class="overview-val">Mon lunch</span></div>
+    <div class="overview-row"><span class="overview-key">Italian</span><span class="overview-val">Tue dinner, Fri lunch</span></div>
+    <div class="overview-row"><span class="overview-key">Middle Eastern</span><span class="overview-val">Wed lunch</span></div>
+    <div class="overview-row"><span class="overview-key">Mexican-inspired</span><span class="overview-val">Thu lunch + dinner</span></div>
+    <div class="overview-row"><span class="overview-key">British-inspired</span><span class="overview-val">Wed dinner</span></div>
+  </div>
+
+  <div class="overview-card">
+    <div class="overview-title">🔄 Protein Variety</div>
+    <div class="overview-row"><span class="overview-key">Lentils</span><span class="overview-val">Mon lunch + dinner</span></div>
+    <div class="overview-row"><span class="overview-key">Eggs</span><span class="overview-val">Tue breakfast, lunch, dinner</span></div>
+    <div class="overview-row"><span class="overview-key">Chicken</span><span class="overview-val">Wed dinner</span></div>
+    <div class="overview-row"><span class="overview-key">Chickpeas</span><span class="overview-val">Wed lunch</span></div>
+    <div class="overview-row"><span class="overview-key">Black beans</span><span class="overview-val">Thu lunch + dinner</span></div>
+    <div class="overview-row"><span class="overview-key">Butter beans</span><span class="overview-val">Fri lunch</span></div>
+  </div>
+
+  <div class="overview-card">
+    <div class="overview-title">📅 Serving Summary</div>
+    <div class="overview-row"><span class="overview-key">Monday</span><span class="overview-val">All meals ×2</span></div>
+    <div class="overview-row"><span class="overview-key">Tuesday</span><span class="overview-val">All meals ×1</span></div>
+    <div class="overview-row"><span class="overview-key">Wednesday</span><span class="overview-val">All meals ×1</span></div>
+    <div class="overview-row"><span class="overview-key">Thursday</span><span class="overview-val">All meals ×1</span></div>
+    <div class="overview-row"><span class="overview-key">Friday</span><span class="overview-val">Breakfast + Lunch ×1</span></div>
+    <div class="overview-row"><span class="overview-key">Sat–Sun</span><span class="overview-val">Away — no meals</span></div>
+  </div>
+</div>
+
+<script>
+  function showTab(id, el) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function toggleCheck(el) { el.classList.toggle('checked'); }
+</script>
+</body>
+</html>
