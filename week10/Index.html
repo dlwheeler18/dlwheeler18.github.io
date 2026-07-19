@@ -1,1 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Week 10 · Summer Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-950:#070c1f;
+    --navy-900:#0b1330;
+    --navy-800:#121c42;
+    --navy-700:#1a2654;
+    --navy-600:#243268;
+    --teal:#5eead4;
+    --coral:#fb9a72;
+    --gold:#f2c879;
+    --text:#eef1fb;
+    --text-dim:#a9b2d6;
+    --text-faint:#7580a8;
+    --line:rgba(255,255,255,0.08);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0;
+    background:radial-gradient(circle at 20% 0%, var(--navy-800), var(--navy-950) 60%);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    padding-bottom:90px;
+    min-height:100vh;
+  }
+  header{
+    padding:28px 20px 16px;
+    text-align:center;
+  }
+  header .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:11px;
+    color:var(--teal);
+    font-weight:600;
+  }
+  header h1{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:26px;
+    margin:6px 0 4px;
+  }
+  header p{
+    margin:0;
+    color:var(--text-dim);
+    font-size:13px;
+  }
+  nav.tabs{
+    display:flex;
+    overflow-x:auto;
+    gap:6px;
+    padding:6px 14px 14px;
+    scrollbar-width:none;
+  }
+  nav.tabs::-webkit-scrollbar{display:none;}
+  nav.tabs button{
+    flex:0 0 auto;
+    background:var(--navy-800);
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    padding:9px 15px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+    font-family:'Inter',sans-serif;
+  }
+  nav.tabs button.active{
+    background:linear-gradient(135deg,var(--teal),#3fc7b0);
+    color:var(--navy-950);
+    border-color:transparent;
+  }
+  main{padding:0 16px;max-width:640px;margin:0 auto;}
+  .panel{display:none;animation:fade .25s ease;}
+  .panel.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
 
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+  .stat-card{
+    background:var(--navy-800);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:14px;
+  }
+  .stat-card .n{font-family:'Fraunces',serif;font-size:24px;color:var(--teal);}
+  .stat-card .l{font-size:11px;color:var(--text-dim);margin-top:2px;}
+
+  .section-title{
+    font-family:'Fraunces',serif;
+    font-size:16px;
+    margin:22px 0 10px;
+    color:var(--gold);
+    display:flex;align-items:center;gap:8px;
+  }
+  .info-card{
+    background:var(--navy-800);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:13.5px;
+    line-height:1.55;
+    color:var(--text-dim);
+    margin-bottom:10px;
+  }
+  .info-card b{color:var(--text);}
+  .pill-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .pill{
+    background:rgba(94,234,212,0.1);
+    border:1px solid rgba(94,234,212,0.25);
+    color:var(--teal);
+    font-size:11.5px;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .defrost-card{
+    background:rgba(251,154,114,0.08);
+    border:1px solid rgba(251,154,114,0.3);
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:13px;
+    color:var(--text-dim);
+    margin-bottom:10px;
+  }
+  .defrost-card b{color:var(--coral);}
+
+  .day-header{
+    display:flex;justify-content:space-between;align-items:baseline;
+    margin:4px 0 16px;
+  }
+  .day-header h2{font-family:'Fraunces',serif;font-size:22px;margin:0;}
+  .serving-badge{
+    background:var(--navy-700);
+    color:var(--gold);
+    font-size:11.5px;
+    font-weight:600;
+    padding:5px 11px;
+    border-radius:999px;
+    border:1px solid var(--line);
+  }
+  .meal-card{
+    background:var(--navy-800);
+    border:1px solid var(--line);
+    border-radius:18px;
+    margin-bottom:16px;
+    overflow:hidden;
+  }
+  .meal-head{
+    padding:15px 16px 12px;
+    border-bottom:1px solid var(--line);
+  }
+  .meal-tag{
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--teal);
+    font-weight:700;
+  }
+  .meal-title{
+    font-family:'Fraunces',serif;
+    font-size:18px;
+    margin:4px 0 6px;
+  }
+  .meal-kcal{font-size:12.5px;color:var(--text-dim);}
+  .meal-body{padding:4px 16px 14px;}
+  .subsection{margin-top:12px;}
+  .subsection h4{
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--text-faint);
+    margin:0 0 8px;
+    font-weight:700;
+  }
+  .ing-list{list-style:none;margin:0;padding:0;font-size:13.5px;color:var(--text);}
+  .ing-list li{padding:4px 0;border-bottom:1px dashed rgba(255,255,255,0.06);}
+  .ing-list li:last-child{border-bottom:none;}
+  .ing-list .amt{color:var(--gold);font-weight:600;margin-right:6px;}
+  .method-list{margin:0;padding-left:18px;font-size:13.5px;color:var(--text-dim);line-height:1.6;}
+  .method-list li{margin-bottom:4px;}
+  .nutri-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  }
+  .nutri-item{
+    background:var(--navy-700);
+    border-radius:10px;
+    padding:8px 6px;
+    text-align:center;
+  }
+  .nutri-item .v{font-size:14px;font-weight:700;color:var(--teal);}
+  .nutri-item .k{font-size:9.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.05em;}
+  .plant-points{margin-top:10px;font-size:12px;color:var(--text-faint);}
+  .plant-points b{color:var(--coral);}
+
+  .aisle{margin-bottom:20px;}
+  .aisle h3{
+    font-family:'Fraunces',serif;
+    font-size:15px;
+    color:var(--gold);
+    margin:0 0 10px;
+    padding-bottom:6px;
+    border-bottom:1px solid var(--line);
+  }
+  .shop-item{
+    display:flex;align-items:center;gap:12px;
+    background:var(--navy-800);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:11px 13px;
+    margin-bottom:7px;
+    font-size:13.5px;
+  }
+  .shop-item .box{
+    width:20px;height:20px;border-radius:6px;
+    border:2px solid var(--text-faint);
+    flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;color:var(--navy-950);
+  }
+  .shop-item.checked .box{background:var(--teal);border-color:var(--teal);}
+  .shop-item.checked .box::after{content:"✓";}
+  .shop-item.checked .label{text-decoration:line-through;color:var(--text-faint);}
+  .shop-item .label{flex:1;}
+  .shop-item .label .amt{color:var(--gold);font-weight:600;}
+  .reset-btn{
+    width:100%;
+    padding:12px;
+    background:var(--navy-700);
+    border:1px solid var(--line);
+    border-radius:12px;
+    color:var(--text-dim);
+    font-size:13px;font-weight:600;
+    margin-top:6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Gut Health · Plant Diversity · Zero UPF</div>
+  <h1>Week 10 — Light Summer</h1>
+  <p>Beetroot · Mushroom · Avocado, woven through a bright, varied week</p>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+<main id="main"></main>
+
+<script>
+const DAYS = [
+  {
+    key:"overview", label:"Overview"
+  },
+  {
+    key:"mon", label:"Mon", full:"Monday", multiplier:2,
+    meals:{
+      breakfast:{
+        tag:"Breakfast · Overnight Oats", title:"Strawberry & Basil Overnight Oats",
+        kcal:473, protein:18, fat:18, satFat:2.5, fibre:13, carbs:63,
+        ingredients:[
+          "50g rolled oats","150ml Plenish oat milk","50g kefir","1 tbsp ground flaxseed",
+          "15g (1 scoop) ZOE Daily30+","100g strawberries, chopped","4 basil leaves, shredded","1 tsp honey","10g flaked almonds"
+        ],
+        method:[
+          "Stir oats, oat milk, kefir and flaxseed together in a jar. Cover and refrigerate overnight.",
+          "In the morning, stir through a scoop of ZOE Daily30+, then top with chopped strawberries, shredded basil, a drizzle of honey and the flaked almonds."
+        ],
+        plants:["oats","strawberry","basil","almond","flaxseed"]
+      },
+      lunch:{
+        tag:"Lunch · Summer Salad", title:"Greek-Style Butter Bean & Roasted Beetroot Salad",
+        kcal:480, protein:18, fat:26, satFat:6, fibre:12, carbs:40,
+        ingredients:[
+          "150g cooked butter beans","150g pre-cooked beetroot, chopped","30g reduced-fat feta, crumbled",
+          "15g walnuts, roughly chopped","40g rocket","¼ red onion, finely sliced",
+          "1 tbsp olive oil","1 tbsp lemon juice","few sprigs fresh mint"
+        ],
+        method:[
+          "Toss the butter beans, beetroot, rocket and red onion together in a bowl.",
+          "Scatter over the feta and walnuts, then dress with olive oil, lemon juice and torn mint."
+        ],
+        plants:["butter beans","beetroot","walnut","rocket","red onion","mint"]
+      },
+      dinner:{
+        tag:"Dinner", title:"Lemon Herb Grilled Chicken, Bulgur Wheat & Roasted Beetroot",
+        kcal:580, protein:42, fat:20, satFat:4, fibre:9, carbs:55,
+        ingredients:[
+          "130g chicken breast","1 tbsp olive oil","zest & juice of ½ lemon","1 garlic clove, crushed",
+          "few sprigs thyme","60g dry bulgur wheat","100g pre-cooked beetroot, chopped",
+          "30g rocket","10g pumpkin seeds"
+        ],
+        method:[
+          "Marinate the chicken in olive oil, lemon zest and juice, garlic and thyme for at least 15 minutes.",
+          "Griddle or pan-fry the chicken until cooked through.",
+          "Cook the bulgur wheat according to packet instructions.",
+          "Serve the chicken over the bulgur with roasted beetroot, rocket and a scatter of pumpkin seeds."
+        ],
+        plants:["bulgur wheat","beetroot","rocket","garlic","thyme","lemon","pumpkin seed"]
+      }
+    }
+  },
+  {
+    key:"tue", label:"Tue", full:"Tuesday", multiplier:1,
+    meals:{
+      breakfast:{
+        tag:"Breakfast · Overnight Oats", title:"Peach & Almond Overnight Oats",
+        kcal:483, protein:17, fat:19, satFat:2, fibre:12, carbs:64,
+        ingredients:["50g rolled oats","150ml Plenish oat milk","50g kefir","1 tbsp ground flaxseed",
+          "15g (1 scoop) ZOE Daily30+","1 ripe peach, chopped","10g flaked almonds","pinch cinnamon"],
+        method:["Combine oats, oat milk, kefir and flaxseed in a jar, cover and chill overnight.",
+          "Stir through a scoop of ZOE Daily30+, then top with chopped peach, flaked almonds and a pinch of cinnamon before eating."],
+        plants:["oats","peach","almond","flaxseed","cinnamon"]
+      },
+      lunch:{
+        tag:"Lunch · Warm Salad", title:"Warm Puy Lentil, Roasted Beetroot & Walnut Salad",
+        kcal:470, protein:19, fat:22, satFat:3, fibre:14, carbs:45,
+        ingredients:["150g cooked puy lentils","100g pre-cooked beetroot, chopped","15g walnuts",
+          "½ orange, segmented","40g rocket","1 tbsp olive oil","1 tsp sherry vinegar"],
+        method:["Warm the lentils gently, then toss with the beetroot and rocket.",
+          "Fold through the orange segments and walnuts, and dress with olive oil and sherry vinegar."],
+        plants:["lentils","beetroot","walnut","orange","rocket"]
+      },
+      dinner:{
+        tag:"Dinner", title:"Mushroom & Black Bean Stuffed Peppers",
+        kcal:560, protein:22, fat:18, satFat:5, fibre:15, carbs:65,
+        ingredients:["2 bell peppers, halved & deseeded","150g chestnut mushrooms, chopped","120g black beans",
+          "½ onion, diced","1 garlic clove","40g brown rice, cooked","½ tsp cumin","½ tsp smoked paprika",
+          "20g grated light cheese","side green salad"],
+        method:["Sauté the onion, garlic and mushrooms until soft, then stir in the black beans, brown rice, cumin and paprika.",
+          "Pile the mixture into the pepper halves, top with cheese and bake at 190°C for 25 minutes.",
+          "Serve with a simple green salad."],
+        plants:["pepper","mushroom","black beans","onion","garlic","brown rice","cumin","smoked paprika"]
+      }
+    }
+  },
+  {
+    key:"wed", label:"Wed", full:"Wednesday", multiplier:1,
+    meals:{
+      breakfast:{
+        tag:"Breakfast · Overnight Oats", title:"Blueberry & Lemon Overnight Oats",
+        kcal:463, protein:17, fat:16, satFat:2, fibre:13, carbs:66,
+        ingredients:["50g rolled oats","150ml Plenish oat milk","50g kefir","1 tbsp ground flaxseed",
+          "15g (1 scoop) ZOE Daily30+","80g frozen blueberries (defrosted)","zest of ½ lemon","10g pumpkin seeds"],
+        method:["Mix oats, oat milk, kefir and flaxseed, cover and refrigerate overnight.",
+          "Stir through a scoop of ZOE Daily30+, then top with defrosted blueberries, lemon zest and pumpkin seeds."],
+        plants:["oats","blueberry","lemon","flaxseed","pumpkin seed"]
+      },
+      lunch:{
+        tag:"Lunch · Summer Salad", title:"Black Bean, Sweetcorn & Avocado Salad",
+        kcal:490, protein:16, fat:24, satFat:4, fibre:13, carbs:48,
+        ingredients:["120g black beans","80g sweetcorn (frozen, defrosted)","½ avocado, sliced",
+          "handful cherry tomatoes, halved","¼ red onion, finely diced","juice of 1 lime",
+          "few leaves mint, torn","1 tbsp olive oil"],
+        method:["Toss the black beans, sweetcorn, tomatoes and red onion together.",
+          "Top with sliced avocado and torn mint, then dress with lime juice and olive oil."],
+        plants:["black beans","sweetcorn","avocado","tomato","red onion","lime","mint"]
+      },
+      dinner:{
+        tag:"Dinner", title:"Grilled Chicken & Summer Vegetable Traybake with Cannellini Mash",
+        kcal:600, protein:44, fat:19, satFat:4, fibre:11, carbs:48,
+        ingredients:["130g chicken breast","1 courgette, sliced","handful cherry tomatoes","½ red onion, wedged",
+          "1 tbsp olive oil","150g cannellini beans","1 garlic clove","few sprigs rosemary"],
+        method:["Toss the chicken, courgette, tomatoes and red onion with olive oil and roast at 200°C for 25 minutes.",
+          "Meanwhile, warm the cannellini beans with garlic and rosemary, then mash roughly with a splash of olive oil.",
+          "Serve the traybake over the cannellini mash."],
+        plants:["courgette","tomato","red onion","cannellini beans","garlic","rosemary"]
+      }
+    }
+  },
+  {
+    key:"thu", label:"Thu", full:"Thursday", multiplier:1,
+    meals:{
+      breakfast:{
+        tag:"Breakfast · Overnight Oats", title:"Mango & Passionfruit Overnight Oats",
+        kcal:473, protein:16, fat:15, satFat:1.5, fibre:13, carbs:68,
+        ingredients:["50g rolled oats","150ml Plenish oat milk","50g kefir","1 tbsp chia seeds",
+          "15g (1 scoop) ZOE Daily30+","80g frozen mango, defrosted","1 passionfruit, halved"],
+        method:["Combine oats, oat milk, kefir and chia seeds, cover and chill overnight.",
+          "Stir through a scoop of ZOE Daily30+, then top with defrosted mango and spoon over the passionfruit pulp."],
+        plants:["oats","mango","passionfruit","chia"]
+      },
+      lunch:{
+        tag:"Lunch · Summer Salad", title:"Cannellini Bean, Tomato & Cucumber Salad with Olives & Basil",
+        kcal:460, protein:15, fat:24, satFat:4, fibre:11, carbs:38,
+        ingredients:["150g cannellini beans","2 tomatoes, chopped","½ cucumber, chopped","8 olives",
+          "¼ red onion, finely sliced","handful basil leaves, torn","1 tbsp olive oil","1 tsp red wine vinegar"],
+        method:["Toss all the salad ingredients together in a bowl.",
+          "Dress with olive oil and red wine vinegar just before serving."],
+        plants:["cannellini beans","tomato","cucumber","olive","red onion","basil"]
+      },
+      dinner:{
+        tag:"Dinner", title:"Grilled Chicken, Avocado & Black Bean Summer Bowl",
+        kcal:610, protein:44, fat:22, satFat:4, fibre:13, carbs:58,
+        ingredients:["130g chicken breast, grilled & sliced","½ avocado, sliced","120g black beans",
+          "80g sweetcorn (frozen, defrosted)","handful cherry tomatoes, halved","juice of ½ lime",
+          "¼ red onion, finely diced","40g brown rice, cooked"],
+        method:["Spoon the warm brown rice and black beans into a bowl.",
+          "Top with sliced chicken, avocado, sweetcorn, tomatoes and red onion.",
+          "Finish with a squeeze of lime juice."],
+        plants:["avocado","black beans","sweetcorn","tomato","lime","red onion","brown rice"]
+      }
+    }
+  },
+  {
+    key:"fri", label:"Fri", full:"Friday", breakfastMult:1, lunchMult:1, dinnerMult:2,
+    meals:{
+      breakfast:{
+        tag:"Breakfast · Overnight Oats", title:"Raspberry & Pistachio Overnight Oats",
+        kcal:463, protein:17, fat:18, satFat:2, fibre:13, carbs:60,
+        ingredients:["50g rolled oats","150ml Plenish oat milk","50g kefir","1 tbsp ground flaxseed",
+          "15g (1 scoop) ZOE Daily30+","80g raspberries","10g pistachios, chopped"],
+        method:["Mix oats, oat milk, kefir and flaxseed, cover and refrigerate overnight.",
+          "Stir through a scoop of ZOE Daily30+, then top with raspberries and chopped pistachios."],
+        plants:["oats","raspberry","pistachio","flaxseed"]
+      },
+      lunch:{
+        tag:"Lunch · Summer Salad", title:"Chickpea, Roasted Pepper & Mushroom Salad with Tahini Dressing",
+        kcal:500, protein:18, fat:24, satFat:3.5, fibre:13, carbs:50,
+        ingredients:["150g chickpeas","1 roasted red pepper, sliced","100g mushrooms, sautéed",
+          "40g baby spinach","1 tbsp tahini","juice of ½ lemon","1 small garlic clove, crushed","water to loosen"],
+        method:["Toss the chickpeas, roasted pepper, sautéed mushrooms and spinach together.",
+          "Whisk the tahini with lemon juice, garlic and a splash of water, then drizzle over the salad."],
+        plants:["chickpeas","pepper","mushroom","spinach","tahini (sesame)","lemon","garlic"]
+      },
+      dinner:{
+        tag:"Dinner · x2 for tonight", title:"Chicken & Mushroom Skewers with Quinoa Tabbouleh",
+        kcal:600, protein:43, fat:20, satFat:4, fibre:10, carbs:55,
+        ingredients:["130g chicken breast, cubed","150g mushrooms, halved","1 courgette, sliced","½ red onion, wedged",
+          "60g dry quinoa","handful parsley, chopped","few mint leaves, chopped","handful cherry tomatoes, diced",
+          "juice of ½ lemon","1 tbsp olive oil"],
+        method:["Thread the chicken, mushrooms, courgette and red onion onto skewers and grill until cooked through.",
+          "Cook the quinoa, then cool slightly and stir through parsley, mint, tomatoes, lemon juice and olive oil.",
+          "Serve the skewers over the quinoa tabbouleh."],
+        plants:["mushroom","courgette","red onion","quinoa","parsley","mint","tomato","lemon"]
+      }
+    }
+  },
+  {
+    key:"sat", label:"Sat", full:"Saturday", multiplier:2,
+    meals:{
+      breakfast:{
+        tag:"Breakfast", title:"Avocado, Beetroot & Feta Sourdough Toast with Soft-Boiled Egg",
+        kcal:430, protein:18, fat:22, satFat:5, fibre:9, carbs:40,
+        ingredients:["1 slice sourdough, toasted","½ avocado, mashed","50g pre-cooked beetroot, sliced",
+          "15g reduced-fat feta, crumbled","1 egg, soft-boiled","10g pumpkin seeds","pinch chilli flakes"],
+        method:["Mash the avocado onto the toasted sourdough.",
+          "Top with sliced beetroot, crumbled feta and the halved soft-boiled egg.",
+          "Finish with pumpkin seeds and a pinch of chilli flakes."],
+        plants:["avocado","beetroot","pumpkin seed","chilli","sourdough (wheat)"]
+      },
+      lunch:{
+        tag:"Lunch · Summer Salad", title:"Beetroot, Orange & Butter Bean Salad with Pistachio & Mint",
+        kcal:470, protein:15, fat:22, satFat:3, fibre:12, carbs:48,
+        ingredients:["150g pre-cooked beetroot, chopped","1 orange, segmented","150g butter beans",
+          "15g pistachios, chopped","30g rocket","few mint leaves","1 tbsp olive oil"],
+        method:["Toss the beetroot, orange segments, butter beans and rocket together.",
+          "Scatter over pistachios and mint, then dress with olive oil."],
+        plants:["beetroot","orange","butter beans","pistachio","mint","rocket"]
+      },
+      dinner:{
+        tag:"Dinner", title:"Butter Bean & Roasted Vegetable Traybake with Feta & Basil",
+        kcal:560, protein:19, fat:24, satFat:5, fibre:14, carbs:55,
+        ingredients:["150g butter beans","1 courgette, sliced","1 red pepper, sliced","½ red onion, wedged",
+          "handful cherry tomatoes","1 tbsp olive oil","25g reduced-fat feta, crumbled","handful basil leaves"],
+        method:["Toss the vegetables with olive oil and roast at 200°C for 25 minutes.",
+          "Stir through the butter beans for the final 10 minutes to warm through.",
+          "Finish with crumbled feta and torn basil."],
+        plants:["butter beans","courgette","pepper","red onion","tomato","basil"]
+      }
+    }
+  },
+  {
+    key:"sun", label:"Sun", full:"Sunday", multiplier:2, bbqNote:true,
+    meals:{
+      breakfast:{
+        tag:"Breakfast · Overnight Oats", title:"Apricot & Coconut Overnight Oats",
+        kcal:483, protein:15, fat:20, satFat:6, fibre:16, carbs:65,
+        ingredients:["50g rolled oats","150ml Plenish oat milk","50g kefir","1 tbsp chia seeds",
+          "15g (1 scoop) ZOE Daily30+","1 apricot, chopped","10g coconut flakes","1 tsp honey"],
+        method:["Combine oats, oat milk, kefir and chia seeds in a jar, cover and refrigerate overnight.",
+          "In the morning, stir through a scoop of ZOE Daily30+, then top with chopped apricot, coconut flakes and a drizzle of honey."],
+        plants:["oats","apricot","coconut","chia"]
+      }
+    }
+  },
+  { key:"shop", label:"Shopping" }
+];
+
+// ---------- Overview content ----------
+const overviewHTML = `
+  <div class="stat-grid">
+    <div class="stat-card"><div class="n">50+</div><div class="l">unique plant points this week</div></div>
+    <div class="stat-card"><div class="n">Daily</div><div class="l">fermented food, via kefir &amp; live yoghurt</div></div>
+    <div class="stat-card"><div class="n">0</div><div class="l">ultra-processed ingredients</div></div>
+    <div class="stat-card"><div class="n">~1,660–1,780</div><div class="l">kcal/day at base serving, incl. Daily30+</div></div>
+  </div>
+
+  <div class="section-title">🌿 This week's focus</div>
+  <div class="info-card">
+    A lighter, brighter week built around the heat — salads, traybakes, quick grills and chilled overnight oats,
+    no stews. <b>Beetroot, mushroom and avocado</b> appear throughout without dominating any single day,
+    so the plate stays varied. Legumes rotate across butter beans, lentils, black beans, cannellini beans and
+    chickpeas — no repeat two days running. <b>Sunday afternoon is left free for your BBQ</b> — only breakfast is planned.
+  </div>
+
+  <div class="section-title">🥄 ZOE Daily30+</div>
+  <div class="info-card">
+    A scoop (15g) of ZOE Daily30+ is stirred into every overnight oats breakfast this week. Per scoop this adds
+    <b>~63 kcal, 4g fat (mostly unsaturated), 3g protein, 8g carbs and 5g fibre</b> — already folded into the
+    nutrition figures on each oats card below, so no extra maths needed day to day.
+  </div>
+
+  <div class="section-title">🫒 Saturated fat approach</div>
+  <div class="info-card">
+    Olive oil is the default fat throughout; feta and cheese appear in small, deliberate amounts rather than as a base.
+    Soluble fibre is boosted via ground flaxseed and chia in the oats, walnuts and pistachios in the salads, and
+    the steady rotation of pulses and beans across lunches and dinners.
+  </div>
+
+  <div class="section-title">❄️ Defrost reminders</div>
+  <div class="defrost-card">
+    <b>Tuesday night:</b> move frozen blueberries to the fridge for Wednesday's oats.<br>
+    <b>Wednesday night:</b> move frozen sweetcorn to the fridge for Wednesday's lunch and Thursday's dinner.<br>
+    <b>Wednesday night:</b> move frozen mango to the fridge for Thursday's oats.
+  </div>
+
+  <div class="section-title">🥣 Overnight oats this week</div>
+  <div class="info-card">
+    Strawberry &amp; Basil · Peach &amp; Almond · Blueberry &amp; Lemon · Mango &amp; Passionfruit · Raspberry &amp; Pistachio · Apricot &amp; Coconut
+    <div class="pill-row">
+      <span class="pill">Mon</span><span class="pill">Tue</span><span class="pill">Wed</span><span class="pill">Thu</span><span class="pill">Fri</span><span class="pill">Sun</span>
+    </div>
+  </div>
+
+  <div class="section-title">📅 Serving structure</div>
+  <div class="info-card">
+    Monday: all meals ×2 &nbsp;·&nbsp; Tuesday–Thursday: all meals ×1 &nbsp;·&nbsp; Friday: breakfast &amp; lunch ×1, dinner ×2 &nbsp;·&nbsp; Saturday: all meals ×2 &nbsp;·&nbsp; Sunday: breakfast ×2 only, BBQ from lunch onwards
+  </div>
+`;
+
+// ---------- Shopping list ----------
+const shoppingHTML = `
+  <div class="aisle">
+    <h3>Fruit &amp; Veg</h3>
+    ${shopItem("Beetroot, pre-cooked (plain, no vinegar)", "~950g (5–6 packs)")}
+    ${shopItem("Avocados", "3")}
+    ${shopItem("Chestnut mushrooms", "~550g")}
+    ${shopItem("Courgettes", "3")}
+    ${shopItem("Red peppers", "2")}
+    ${shopItem("Bell peppers (for stuffing)", "2")}
+    ${shopItem("Cherry tomatoes", "3 punnets")}
+    ${shopItem("Tomatoes, standard", "2")}
+    ${shopItem("Cucumber", "1")}
+    ${shopItem("Red onions", "4")}
+    ${shopItem("Onions", "1")}
+    ${shopItem("Garlic bulb", "1")}
+    ${shopItem("Rocket", "2 bags")}
+    ${shopItem("Baby spinach", "1 bag")}
+    ${shopItem("Strawberries", "1 punnet")}
+    ${shopItem("Peach", "1")}
+    ${shopItem("Raspberries", "1 punnet")}
+    ${shopItem("Orange", "2")}
+    ${shopItem("Apricot", "2 (2 servings for Sunday)")}
+    ${shopItem("Passionfruit", "1")}
+    ${shopItem("Lemons", "4")}
+    ${shopItem("Limes", "2")}
+    ${shopItem("Fresh basil", "1 bunch")}
+    ${shopItem("Fresh mint", "1 bunch")}
+    ${shopItem("Fresh parsley", "1 bunch")}
+    ${shopItem("Fresh thyme", "1 small pack")}
+    ${shopItem("Fresh rosemary", "1 small pack")}
+  </div>
+
+  <div class="aisle">
+    <h3>Freezer</h3>
+    ${shopItem("Frozen blueberries", "80g needed")}
+    ${shopItem("Frozen mango", "80g needed")}
+    ${shopItem("Frozen sweetcorn", "160g needed")}
+  </div>
+
+  <div class="aisle">
+    <h3>Meat</h3>
+    ${shopItem("Chicken breast", "~800g total")}
+  </div>
+
+  <div class="aisle">
+    <h3>Chilled &amp; Dairy</h3>
+    ${shopItem("Plenish oat milk", "2 cartons")}
+    ${shopItem("Kefir", "1 large bottle")}
+    ${shopItem("ZOE Daily30+", "check scoops remaining — 1 scoop per oats serving, 8 servings this week")}
+    ${shopItem("Live natural yoghurt", "1 pot")}
+    ${shopItem("Reduced-fat feta", "1 block")}
+    ${shopItem("Light grated cheese", "small pack")}
+    ${shopItem("Eggs", "2")}
+  </div>
+
+  <div class="aisle">
+    <h3>Bakery</h3>
+    ${shopItem("Sourdough loaf", "1")}
+  </div>
+
+  <div class="aisle">
+    <h3>Store Cupboard — Grains &amp; Legumes</h3>
+    ${shopItem("Rolled oats", "1 large bag")}
+    ${shopItem("Bulgur wheat, dry", "60g needed")}
+    ${shopItem("Quinoa, dry", "60g needed")}
+    ${shopItem("Brown rice", "80g needed")}
+    ${shopItem("Butter beans, tinned", "3 tins")}
+    ${shopItem("Puy lentils, cooked or tinned", "1 pack/tin")}
+    ${shopItem("Black beans, tinned", "2 tins")}
+    ${shopItem("Cannellini beans, tinned", "2 tins")}
+    ${shopItem("Chickpeas, tinned", "1 tin")}
+  </div>
+
+  <div class="aisle">
+    <h3>Store Cupboard — Other</h3>
+    ${shopItem("Olive oil", "check levels")}
+    ${shopItem("Ground flaxseed", "check levels")}
+    ${shopItem("Chia seeds", "small pack")}
+    ${shopItem("Flaked almonds", "small pack")}
+    ${shopItem("Walnuts", "small pack")}
+    ${shopItem("Pistachios", "small pack")}
+    ${shopItem("Pumpkin seeds", "small pack")}
+    ${shopItem("Coconut flakes", "small pack")}
+    ${shopItem("Tahini", "1 jar (if not in stock)")}
+    ${shopItem("Olives", "1 small jar/pack")}
+    ${shopItem("Honey", "check levels")}
+    ${shopItem("Cumin, smoked paprika, cinnamon, chilli flakes", "check levels")}
+    ${shopItem("Sherry vinegar, red wine vinegar", "check levels")}
+  </div>
+
+  <button class="reset-btn" onclick="resetShopping()">Reset shopping list</button>
+`;
+
+function shopItem(name, amt){
+  return `<div class="shop-item" onclick="this.classList.toggle('checked'); saveShopping();">
+    <div class="box"></div>
+    <div class="label">${name} <span class="amt">— ${amt}</span></div>
+  </div>`;
+}
+function saveShopping(){
+  const states = Array.from(document.querySelectorAll('.shop-item')).map(el=>el.classList.contains('checked'));
+  window.__shopState = states;
+}
+function resetShopping(){
+  document.querySelectorAll('.shop-item').forEach(el=>el.classList.remove('checked'));
+}
+
+// ---------- Rendering ----------
+function multiplierFor(day, mealKey){
+  if(day.multiplier) return day.multiplier;
+  if(mealKey==="breakfast") return day.breakfastMult;
+  if(mealKey==="lunch") return day.lunchMult;
+  if(mealKey==="dinner") return day.dinnerMult;
+  return 1;
+}
+
+function mealCard(meal, mult){
+  const multNote = mult===2 ? `<span style="color:var(--coral);font-weight:600;"> · ×2 today</span>` : "";
+  return `
+    <div class="meal-card">
+      <div class="meal-head">
+        <div class="meal-tag">${meal.tag}${multNote}</div>
+        <div class="meal-title">${meal.title}</div>
+        <div class="meal-kcal">${meal.kcal} kcal per serving</div>
+      </div>
+      <div class="meal-body">
+        <div class="subsection">
+          <h4>Ingredients ${mult===2 ? "(×2 quantities below)" : "(per serving)"}</h4>
+          <ul class="ing-list">
+            ${meal.ingredients.map(i=>`<li>${i}</li>`).join("")}
+          </ul>
+        </div>
+        <div class="subsection">
+          <h4>How to Make It</h4>
+          <ol class="method-list">
+            ${meal.method.map(s=>`<li>${s}</li>`).join("")}
+          </ol>
+        </div>
+        <div class="subsection">
+          <h4>Nutrition (per serving)</h4>
+          <div class="nutri-grid">
+            <div class="nutri-item"><div class="v">${meal.kcal}</div><div class="k">kcal</div></div>
+            <div class="nutri-item"><div class="v">${meal.protein}g</div><div class="k">protein</div></div>
+            <div class="nutri-item"><div class="v">${meal.fat}g</div><div class="k">fat</div></div>
+            <div class="nutri-item"><div class="v">${meal.satFat}g</div><div class="k">sat fat</div></div>
+            <div class="nutri-item"><div class="v">${meal.fibre}g</div><div class="k">fibre</div></div>
+            <div class="nutri-item"><div class="v">${meal.carbs}g</div><div class="k">carbs</div></div>
+          </div>
+        </div>
+        <div class="plant-points"><b>Plant points:</b> ${meal.plants.join(", ")}</div>
+      </div>
+    </div>
+  `;
+}
+
+function dayPanel(day){
+  if(day.bbqNote){
+    const badge = `Breakfast ×${day.multiplier} · BBQ from lunch`;
+    return `
+      <div class="day-header">
+        <h2>${day.full}</h2>
+        <span class="serving-badge">${badge}</span>
+      </div>
+      ${mealCard(day.meals.breakfast, multiplierFor(day,"breakfast"))}
+      <div class="info-card" style="text-align:center;">
+        🔥 <b style="color:var(--text);">BBQ afternoon</b> — lunch and dinner are left open. Enjoy!
+      </div>
+    `;
+  }
+  const badge = day.multiplier ? `All meals ×${day.multiplier}` :
+    `B/L ×${day.breakfastMult} · Dinner ×${day.dinnerMult}`;
+  return `
+    <div class="day-header">
+      <h2>${day.full}</h2>
+      <span class="serving-badge">${badge}</span>
+    </div>
+    ${mealCard(day.meals.breakfast, multiplierFor(day,"breakfast"))}
+    ${mealCard(day.meals.lunch, multiplierFor(day,"lunch"))}
+    ${mealCard(day.meals.dinner, multiplierFor(day,"dinner"))}
+  `;
+}
+
+const tabsEl = document.getElementById("tabs");
+const mainEl = document.getElementById("main");
+
+DAYS.forEach(day=>{
+  const btn = document.createElement("button");
+  btn.textContent = day.label;
+  btn.dataset.key = day.key;
+  btn.onclick = ()=>showPanel(day.key);
+  tabsEl.appendChild(btn);
+
+  const panel = document.createElement("div");
+  panel.className = "panel";
+  panel.id = "panel-"+day.key;
+  if(day.key==="overview") panel.innerHTML = overviewHTML;
+  else if(day.key==="shop") panel.innerHTML = shoppingHTML;
+  else panel.innerHTML = dayPanel(day);
+  mainEl.appendChild(panel);
+});
+
+function showPanel(key){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("panel-"+key).classList.add("active");
+  document.querySelector(`nav.tabs button[data-key="${key}"]`).classList.add("active");
+}
+showPanel("overview");
+</script>
+</body>
+</html>
